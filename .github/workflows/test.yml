@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.1
+        uses: oalders/install-ubi-action@v0.0.2
         id: ubi
 
       - name: Use ubi to install other tools
