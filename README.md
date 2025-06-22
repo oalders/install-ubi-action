@@ -4,6 +4,13 @@ This GitHub Action installs [ubi (Universal Binary
 Installer)](https://github.com/houseabsolute/ubi), a nifty tool for downloading
 and installing pre-built binaries from GitHub releases.
 
+`ubi` will be installed into `/usr/local/bin`. After that you can specify the
+path where you'd like to install additional binaries. e.g.
+
+```
+sudo ubi --project oalders/is --in /usr/local/bin`
+```
+
 ## Usage
 
 ### Basic Usage
