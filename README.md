@@ -8,7 +8,7 @@ and installing pre-built binaries from GitHub releases.
 path where you'd like to install additional binaries. e.g.
 
 ```
-sudo ubi --project oalders/is --in /usr/local/bin`
+sudo ubi --project oalders/is --in /usr/local/bin
 ```
 
 ## Usage
@@ -16,26 +16,24 @@ sudo ubi --project oalders/is --in /usr/local/bin`
 ### Basic Usage
 
 ```yaml
-- uses: oalders/install-ubi-action@v0.0.1
+- uses: oalders/install-ubi-action@v0.0.2
 ```
 
 ### Complete Workflow Example
 
 ```yaml
 name: CI
-on: [push, pull_request]
+on: [pull_request, workflow_dispatch]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.1
+        uses: oalders/install-ubi-action@v0.0.2
         id: ubi
 
-      - name: Use ubi to install other tools
+      - name: Use ubi to install "is" and "debounce"
         run: |
           # Install is using ubi
           sudo ubi --project oalders/is --in /usr/local/bin
@@ -58,7 +56,7 @@ jobs:
 | `sudo` | Whether to use sudo for installation (required for `/usr/local/bin` on most systems) | No | `true` |
 
 
-**Note:** For version 0.0.1, the bootstrap script is pinned to commit
+**Note:** the bootstrap script is pinned to commit
 `d9348539c2521f05225618139ea23fd3f54bce46` for reproducibility and security.
 
 ## Outputs
@@ -67,6 +65,7 @@ jobs:
 |--------|-------------|
 | `version` | The version of ubi that was installed |
 | `path` | The path where ubi was installed |
+
 
 ## What is ubi?
 
