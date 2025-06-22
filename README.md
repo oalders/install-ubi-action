@@ -30,24 +30,26 @@ jobs:
 
       - name: Use ubi to install other tools
         run: |
-          # Install ripgrep using ubi
-          ubi --project BurntSushi/ripgrep --in ~/bin
+          # Install is using ubi
+          sudo ubi --project oalders/is --in /usr/local/bin
 
-          # Install fd using ubi
-          ubi --project sharkdp/fd --in ~/bin
+          # Install debounce using ubi
+          sudo ubi --project oalders/debounce --in /usr/local/bin
 
       - name: Verify installations
         run: |
           echo "ubi version: ${{ steps.ubi.outputs.version }}"
           echo "ubi path: ${{ steps.ubi.outputs.path }}"
-          ~/bin/rg --version
-          ~/bin/fd --version
+          is --version
+          debounce --version
 ```
 
 ## Inputs
 
-This action takes no inputs - the ubi bootstrap script automatically installs
-the latest version to the appropriate location.
+| Input | Description | Required | Default |
+|-------|-------------|----------|---------|
+| `sudo` | Whether to use sudo for installation (required for `/usr/local/bin` on most systems) | No | `true` |
+
 
 **Note:** For version 0.0.1, the bootstrap script is pinned to commit
 `d9348539c2521f05225618139ea23fd3f54bce46` for reproducibility and security.

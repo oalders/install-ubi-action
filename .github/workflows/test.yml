@@ -13,7 +13,7 @@ jobs:
       - name: Use ubi to install other tools
         run: |
           # Install is using ubi
-          ubi --project oalders/is
+          sudo ubi --project oalders/is
 
       - name: Verify installations
         run: |
