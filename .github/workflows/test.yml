@@ -1,0 +1,22 @@
+---
+name: CI
+on: [pull_request, workflow_dispatch]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install ubi
+        uses: oalders/install-ubi-action@v0.0.1
+        id: ubi
+
+      - name: Use ubi to install other tools
+        run: |
+          # Install is using ubi
+          ubi --project oalders/is
+
+      - name: Verify installations
+        run: |
+          echo "ubi version: ${{ steps.ubi.outputs.version }}"
+          echo "ubi path: ${{ steps.ubi.outputs.path }}"
+          is --version
