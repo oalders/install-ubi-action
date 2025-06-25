@@ -1,61 +1,32 @@
----
-name: 'Install ubi (Universal Binary Installer)'
-description: 'Installs ubi, a tool for installing pre-built binaries'
-author: 'Your Name'
-
-branding:
-  icon: 'download'
-  color: 'blue'
+name: 'Install UBI'
+description: 'Install IBM UBI tool'
 
 inputs:
-  sudo:
-    description: 'Whether to use sudo for installation (required for /usr/local/bin on most systems)'
+  version:
+    description: 'UBI version to install (e.g. v0.0.36 or "latest")'
     required: false
-    default: 'true'
+    default: 'latest'
+
+  install-path:
+    description: 'Directory for the UBI binary'
+    required: false
+    default: '/usr/local/bin'
+
+  sudo:
+    description: 'Install with sudo'
+    required: false
+    default: 'false'
 
 outputs:
-  version:
-    description: 'The version of ubi that was installed'
-    value: ${{ steps.install.outputs.version }}
-
-  path:
-    description: 'The path where ubi was installed'
-    value: ${{ steps.install.outputs.path }}
+  ubi-path:
+    description: 'Full path to the installed UBI binary'
 
 runs:
   using: 'composite'
   steps:
-    - name: Install ubi
-      id: install
+    - run: ./entrypoint.sh
       shell: bash
-      run: |
-        set -eux -o pipefail
 
-        echo "Installing ubi universal binary installer..."
-
-        # Download and run the bootstrap script
-        # Use sudo since we're installing to /usr/local/bin
-        if [[ "${{ inputs.sudo }}" == "true" ]]; then
-          curl --silent --location \
-            https://raw.githubusercontent.com/houseabsolute/ubi/d9348539c2521f05225618139ea23fd3f54bce46/bootstrap/bootstrap-ubi.sh | \
-            sudo sh
-        else
-          curl --silent --location \
-            https://raw.githubusercontent.com/houseabsolute/ubi/d9348539c2521f05225618139ea23fd3f54bce46/bootstrap/bootstrap-ubi.sh | \
-            sh
-        fi
-
-        # Verify installation
-        if command -v ubi >/dev/null 2>&1; then
-          UBI_VERSION=$(ubi --version | head -n1 | awk '{print $2}')
-          UBI_PATH=$(which ubi)
-          echo "✅ ubi ${UBI_VERSION} installed successfully at ${UBI_PATH}"
-          echo "version=${UBI_VERSION}" >> $GITHUB_OUTPUT
-          echo "path=${UBI_PATH}" >> $GITHUB_OUTPUT
-        else
-          echo "❌ Failed to install ubi"
-          exit 1
-        fi
-
-        # Add to PATH for subsequent steps
-        echo "$(dirname $(which ubi))" >> $GITHUB_PATH
+branding:
+  icon: 'package'
+  color: 'blue'
