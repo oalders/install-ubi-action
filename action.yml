@@ -11,7 +11,7 @@ inputs:
   sudo:
     description: 'Whether to use sudo for installation (required for /usr/local/bin on most systems)'
     required: false
-    default: 'true'
+    default: 'false'
 
 outputs:
   version:
