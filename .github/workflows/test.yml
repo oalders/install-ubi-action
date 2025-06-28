@@ -45,3 +45,4 @@ jobs:
           is there ubi --verbose
           is there is --verbose
           is known summary var --md >> $GITHUB_STEP_SUMMARY
+          sudo is known summary var --md >> $GITHUB_STEP_SUMMARY
