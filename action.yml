@@ -41,16 +41,16 @@ runs:
           export TARGET
         fi
 
+        COMMIT=d9348539c2521f05225618139ea23fd3f54bce46
+        URL_PATH="houseabsolute/ubi/$COMMIT/bootstrap/bootstrap-ubi.sh"
+        URL=https://raw.githubusercontent.com/$URL_PATH
+
         # Download and run the bootstrap script
         # Use sudo since we're installing to /usr/local/bin
         if [[ "${{ inputs.sudo }}" == "true" ]]; then
-          curl --silent --location \
-            https://raw.githubusercontent.com/houseabsolute/ubi/d9348539c2521f05225618139ea23fd3f54bce46/bootstrap/bootstrap-ubi.sh | \
-            sudo sh
+          curl --silent --location $URL | sudo sh
         else
-          curl --silent --location \
-            https://raw.githubusercontent.com/houseabsolute/ubi/d9348539c2521f05225618139ea23fd3f54bce46/bootstrap/bootstrap-ubi.sh | \
-            sh
+          curl --silent --location $URL | sh
         fi
 
         # Verify installation
