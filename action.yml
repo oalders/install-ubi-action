@@ -48,9 +48,9 @@ runs:
         # Download and run the bootstrap script
         # Use sudo since we're installing to /usr/local/bin
         if [[ "${{ inputs.sudo }}" == "true" ]]; then
-          curl --silent --location $URL | sudo sh
+          curl --silent --location $URL | TARGET=$TARGET sudo sh
         else
-          curl --silent --location $URL | sh
+          curl --silent --location $URL | TARGET=$TARGET sh
         fi
 
         # Verify installation
