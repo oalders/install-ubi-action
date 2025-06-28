@@ -4,10 +4,10 @@ This GitHub Action installs [ubi (Universal Binary
 Installer)](https://github.com/houseabsolute/ubi), a nifty tool for downloading
 and installing pre-built binaries from GitHub releases.
 
-`ubi` will be installed into `/usr/local/bin`. After that you can specify the
+`ubi` will be installed into `/home/runner/.local/bin`. After that you can specify the
 path where you'd like to install additional binaries. e.g.
 
-```
+```shell
 sudo ubi --project oalders/is --in /usr/local/bin
 ```
 
@@ -16,7 +16,7 @@ sudo ubi --project oalders/is --in /usr/local/bin
 ### Basic Usage
 
 ```yaml
-- uses: oalders/install-ubi-action@v0.0.2
+- uses: oalders/install-ubi-action@v0.0.3
 ```
 
 ### Complete Workflow Example
@@ -26,35 +26,56 @@ name: CI
 on: [pull_request, workflow_dispatch]
 
 jobs:
-  test:
+  no_sudo:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.2
+        uses: oalders/install-ubi-action@v0.0.3
         id: ubi
 
       - name: Use ubi to install "is" and "debounce"
         run: |
-          # Install is using ubi
-          sudo ubi --project oalders/is --in /usr/local/bin
-
-          # Install debounce using ubi
-          sudo ubi --project oalders/debounce --in /usr/local/bin
+          ubi --project oalders/is
+          ubi --project oalders/debounce
 
       - name: Verify installations
         run: |
           echo "ubi version: ${{ steps.ubi.outputs.version }}"
           echo "ubi path: ${{ steps.ubi.outputs.path }}"
-          is --version
-          debounce --version
+          is there ubi --verbose
+          is there is --verbose
+          is there debounce --verbose
+          is known summary var --md >> $GITHUB_STEP_SUMMARY
+
+  with_sudo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install ubi
+        uses: oalders/install-ubi-action@v0.0.3
+        id: ubi
+        with:
+            sudo: true
+        env:
+            TARGET: /usr/local/bin
+
+      - name: Use ubi to install other tools
+        run: |
+          sudo ubi --project oalders/is --in /usr/local/bin
+
+      - name: Verify installations
+        run: |
+          echo "ubi version: ${{ steps.ubi.outputs.version }}"
+          echo "ubi path: ${{ steps.ubi.outputs.path }}"
+          is there ubi --verbose
+          is there is --verbose
+          is known summary var --md >> $GITHUB_STEP_SUMMARY
 ```
 
 ## Inputs
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `sudo` | Whether to use sudo for installation (required for `/usr/local/bin` on most systems) | No | `true` |
-
+| `sudo` | Whether to use sudo for installation | No | `false` |
 
 **Note:** the bootstrap script is pinned to commit
 `d9348539c2521f05225618139ea23fd3f54bce46` for reproducibility and security.
@@ -66,10 +87,9 @@ jobs:
 | `version` | The version of ubi that was installed |
 | `path` | The path where ubi was installed |
 
-
 ## What is ubi?
 
-[ubi](https://github.com/houseabsolute/ubi)  is a universal binary installer
+[ubi](https://github.com/houseabsolute/ubi) is a universal binary installer
 that makes it easy to download and install pre-built binaries from GitHub
 releases. It's particularly useful for:
 

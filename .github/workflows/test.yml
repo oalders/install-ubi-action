@@ -3,32 +3,6 @@ name: CI
 on: [pull_request, workflow_dispatch]
 
 jobs:
-  sudo:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install ubi
-        uses: ./
-        id: ubi
-        with:
-          sudo: true
-        env:
-          TARGET: /usr/local/bin
-      - name: Use ubi to install other tools
-        run: |
-          # Install is using ubi
-          sudo echo $PATH
-          sudo ubi --project oalders/is --in /usr/local/bin
-
-      - name: Verify installations
-        run: |
-          echo "ubi version: ${{ steps.ubi.outputs.version }}"
-          echo "ubi path: ${{ steps.ubi.outputs.path }}"
-          is there ubi --verbose
-          is there is --verbose
-          is known summary var --md >> $GITHUB_STEP_SUMMARY
   no_sudo:
     runs-on: ubuntu-latest
     steps:
@@ -44,6 +18,30 @@ jobs:
 
       - name: Verify installations
         run: |
+          is there ubi --verbose
+          is there is --verbose
+          is known summary var --md >> $GITHUB_STEP_SUMMARY
+  sudo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ubi
+        uses: ./
+        id: ubi
+        with:
+          sudo: true
+        env:
+          TARGET: /usr/local/bin
+      - name: Use ubi to install other tools
+        run: |
+          sudo ubi --project oalders/is --in /usr/local/bin
+
+      - name: Verify installations
+        run: |
+          echo "ubi version: ${{ steps.ubi.outputs.version }}"
+          echo "ubi path: ${{ steps.ubi.outputs.path }}"
           is there ubi --verbose
           is there is --verbose
           is known summary var --md >> $GITHUB_STEP_SUMMARY
