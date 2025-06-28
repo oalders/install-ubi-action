@@ -33,6 +33,14 @@ runs:
 
         echo "Installing ubi universal binary installer..."
 
+        LOCAL_BIN=/home/runner/.local/bin
+        if [[ -z "${TARGET:-}" ]] && [[ -d $LOCAL_BIN ]]; then
+          TARGET=$LOCAL_BIN
+          echo "Setting TARGET to ${TARGET}"
+          echo $TARGET >> $GITHUB_PATH
+          export TARGET
+        fi
+
         # Download and run the bootstrap script
         # Use sudo since we're installing to /usr/local/bin
         if [[ "${{ inputs.sudo }}" == "true" ]]; then
