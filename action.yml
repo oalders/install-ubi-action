@@ -34,23 +34,23 @@ runs:
         echo "Installing ubi universal binary installer..."
 
         LOCAL_BIN=/home/runner/.local/bin
+        mkdir -p $LOCAL_BIN
         if [[ -z "${TARGET:-}" ]] && [[ -d $LOCAL_BIN ]]; then
           TARGET=$LOCAL_BIN
           echo "Setting TARGET to ${TARGET}"
-          echo $TARGET >> $GITHUB_PATH
           export TARGET
         fi
 
         COMMIT=d9348539c2521f05225618139ea23fd3f54bce46
         URL_PATH="houseabsolute/ubi/$COMMIT/bootstrap/bootstrap-ubi.sh"
-        URL=https://raw.githubusercontent.com/$URL_PATH
+        INSTALLER=https://raw.githubusercontent.com/$URL_PATH
 
         # Download and run the bootstrap script
         # Use sudo since we're installing to /usr/local/bin
         if [[ "${{ inputs.sudo }}" == "true" ]]; then
-          curl --silent --location $URL | TARGET=$TARGET sudo sh
+          curl --silent --location "$INSTALLER" | TARGET="$TARGET" sudo sh
         else
-          curl --silent --location $URL | TARGET=$TARGET sh
+          curl --silent --location "$INSTALLER" | TARGET="$TARGET" sh
         fi
 
         # Verify installation
