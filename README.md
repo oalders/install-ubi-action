@@ -55,12 +55,32 @@ jobs:
         id: ubi
         with:
             sudo: true
-        env:
-            TARGET: /usr/local/bin
 
       - name: Use ubi to install other tools
         run: |
-          sudo ubi --project oalders/is --in /usr/local/bin
+          sudo ubi --project oalders/is
+
+      - name: Verify installations
+        run: |
+          echo "ubi version: ${{ steps.ubi.outputs.version }}"
+          echo "ubi path: ${{ steps.ubi.outputs.path }}"
+          is there ubi --verbose
+          is there is --verbose
+          is known summary var --md >> $GITHUB_STEP_SUMMARY
+
+  with_sudo_target:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install ubi
+        uses: oalders/install-ubi-action@v0.0.3
+        id: ubi
+        with:
+            sudo: true
+        env:
+          TARGET: /usr/local/sbin
+      - name: Use ubi to install other tools
+        run: |
+          sudo ubi --project oalders/is --in /usr/sbin
 
       - name: Verify installations
         run: |

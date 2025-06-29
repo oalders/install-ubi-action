@@ -33,9 +33,12 @@ runs:
 
         echo "Installing ubi universal binary installer..."
 
+        # If run as non-root, ubi defaults to installing into ~/bin, which is
+        # not in the default PATH in GitHub CI. So, we'll default to
+        # ~/.local/bin
         LOCAL_BIN=/home/runner/.local/bin
         test -d $LOCAL_BIN || mkdir -p $LOCAL_BIN
-        if [[ -z "${TARGET:-}" ]] && [[ -d $LOCAL_BIN ]]; then
+        if [[ "${{ inputs.sudo }}" != "true" && -z "${TARGET:-}" ]]; then
           TARGET=$LOCAL_BIN
           echo "Setting TARGET to ${TARGET}"
           export TARGET
@@ -46,9 +49,12 @@ runs:
         INSTALLER=https://raw.githubusercontent.com/$URL_PATH
 
         # Download and run the bootstrap script
-        # Use sudo since we're installing to /usr/local/bin
         if [[ "${{ inputs.sudo }}" == "true" ]]; then
-          curl --silent --location "$INSTALLER" | TARGET="$TARGET" sudo sh
+          if [[ -z "${TARGET:-}" ]]; then
+            curl --silent --location "$INSTALLER" | sudo sh
+          else
+            curl --silent --location "$INSTALLER" | sudo -E env "TARGET=$TARGET" sh
+          fi
         else
           curl --silent --location "$INSTALLER" | TARGET="$TARGET" sh
         fi
