@@ -16,7 +16,7 @@ sudo ubi --project oalders/is --in /usr/local/bin
 ### Basic Usage
 
 ```yaml
-- uses: oalders/install-ubi-action@v0.0.3
+- uses: oalders/install-ubi-action@v0.0.4
 ```
 
 ### Complete Workflow Example
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.3
+        uses: oalders/install-ubi-action@v0.0.4
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.3
+        uses: oalders/install-ubi-action@v0.0.4
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.3
+        uses: oalders/install-ubi-action@v0.0.4
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
