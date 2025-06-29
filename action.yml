@@ -12,6 +12,10 @@ inputs:
     description: 'Whether to use sudo for installation (required for /usr/local/bin on most systems)'
     required: false
     default: 'false'
+  GITHUB_TOKEN:
+    description: 'GitHub token to use for API requests, helps avoid rate limiting'
+    required: false
+    default: ''
 
 outputs:
   version:
@@ -51,12 +55,12 @@ runs:
         # Download and run the bootstrap script
         if [[ "${{ inputs.sudo }}" == "true" ]]; then
           if [[ -z "${TARGET:-}" ]]; then
-            curl --silent --location "$INSTALLER" | sudo sh
+            curl --silent --location "$INSTALLER" | GITHUB_TOKEN="${{ inputs.GITHUB_TOKEN }}" sudo -E sh
           else
-            curl --silent --location "$INSTALLER" | sudo -E env "TARGET=$TARGET" sh
+            curl --silent --location "$INSTALLER" | sudo -E env "TARGET=$TARGET" "GITHUB_TOKEN=${{ inputs.github_token }}" sh
           fi
         else
-          curl --silent --location "$INSTALLER" | TARGET="$TARGET" sh
+          curl --silent --location "$INSTALLER" | env "TARGET=$TARGET" "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" sh
         fi
 
         # Verify installation

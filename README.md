@@ -32,11 +32,15 @@ jobs:
       - name: Install ubi
         uses: oalders/install-ubi-action@v0.0.3
         id: ubi
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Use ubi to install "is" and "debounce"
         run: |
           ubi --project oalders/is
           ubi --project oalders/debounce
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installations
         run: |
@@ -54,11 +58,14 @@ jobs:
         uses: oalders/install-ubi-action@v0.0.3
         id: ubi
         with:
-            sudo: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          sudo: true
 
       - name: Use ubi to install other tools
         run: |
           sudo ubi --project oalders/is
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installations
         run: |
@@ -75,12 +82,15 @@ jobs:
         uses: oalders/install-ubi-action@v0.0.3
         id: ubi
         with:
-            sudo: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          sudo: true
         env:
           TARGET: /usr/local/sbin
       - name: Use ubi to install other tools
         run: |
           sudo ubi --project oalders/is --in /usr/sbin
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installations
         run: |
@@ -96,6 +106,7 @@ jobs:
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
 | `sudo` | Whether to use sudo for installation | No | `false` |
+| `GITHUB_TOKEN` | GitHub token to use for API requests, helps avoid rate limiting | No | `''` |
 
 **Note:** the bootstrap script is pinned to commit
 `d9348539c2521f05225618139ea23fd3f54bce46` for reproducibility and security.

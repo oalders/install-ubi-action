@@ -12,6 +12,8 @@ jobs:
       - name: Install ubi
         uses: ./
         id: ubi
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Use ubi to install other tools
         run: ubi --project oalders/is --in /home/runner/.local/bin
@@ -21,6 +23,8 @@ jobs:
           is there ubi --verbose
           is there is --verbose
           is known summary var --md >> $GITHUB_STEP_SUMMARY
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sudo:
     runs-on: ubuntu-latest
     steps:
@@ -31,10 +35,13 @@ jobs:
         uses: ./
         id: ubi
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           sudo: true
       - name: Use ubi to install other tools
         run: |
           sudo ubi --project oalders/is --in /usr/local/bin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installations
         run: |
@@ -44,6 +51,8 @@ jobs:
           is there is --verbose
           is known summary var --md >> $GITHUB_STEP_SUMMARY
           sudo is known summary var --md >> $GITHUB_STEP_SUMMARY
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   sudo_with_target:
     runs-on: ubuntu-latest
@@ -55,6 +64,7 @@ jobs:
         uses: ./
         id: ubi
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           sudo: true
         env:
           TARGET: /usr/local/sbin
