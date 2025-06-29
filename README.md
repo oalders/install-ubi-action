@@ -16,7 +16,7 @@ sudo ubi --project oalders/is --in /usr/local/bin
 ### Basic Usage
 
 ```yaml
-- uses: oalders/install-ubi-action@v0.0.4
+- uses: oalders/install-ubi-action@v0.0.5
 ```
 
 ### Complete Workflow Example
@@ -26,11 +26,21 @@ name: CI
 on: [pull_request, workflow_dispatch]
 
 jobs:
+  minimal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install ubi, is and debounce
+        uses: oalders/install-ubi-action@v0.0.5
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          projects: |
+            oalders/is
+            oalders/debounce -v
   no_sudo:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.4
+        uses: oalders/install-ubi-action@v0.0.5
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.4
+        uses: oalders/install-ubi-action@v0.0.5
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -79,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.4
+        uses: oalders/install-ubi-action@v0.0.5
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -105,6 +115,7 @@ jobs:
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
+| `projects` | Newline-delimited list of projects to install using ubi | No | `''` |
 | `sudo` | Whether to use sudo for installation | No | `false` |
 | `GITHUB_TOKEN` | GitHub token to use for API requests, helps avoid rate limiting | No | `''` |
 

@@ -8,6 +8,10 @@ branding:
   color: 'blue'
 
 inputs:
+  projects:
+    description: 'Newline-delimited list of projects to install using ubi after installation'
+    required: false
+    default: ''
   sudo:
     description: 'Whether to use sudo for installation (required for /usr/local/bin on most systems)'
     required: false
@@ -78,4 +82,24 @@ runs:
         # Maybe add to PATH for subsequent steps
         if [[ ! "$(command -v ubi)" ]]; then
           echo "$(dirname $(which ubi))" >> $GITHUB_PATH
+        fi
+
+        # Install additional projects if specified
+        if [[ -n "${{ inputs.projects }}" ]]; then
+          echo "Installing specified projects with ubi..."
+
+          # Process each project in the newline-delimited list
+          echo "${{ inputs.projects }}" | while read -r project; do
+            if [[ -n "$project" ]]; then
+              echo "Installing $project..."
+
+              if [[ "${{ inputs.sudo }}" == "true" ]]; then
+                sudo -E env "GITHUB_TOKEN=${{ inputs.github_token }}" ubi --project $project
+              else
+                env "GITHUB_TOKEN=${{ inputs.github_token }}" ubi --project $project --in "$TARGET"
+              fi
+
+              echo "✅ Installed $project"
+            fi
+          done
         fi
