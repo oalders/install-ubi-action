@@ -118,7 +118,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           projects: |
-            oalders/is
+            oalders/is -v
             oalders/debounce -v
 
       - name: Verify installations
