@@ -39,6 +39,8 @@ jobs:
 
       - name: Use ubi to install other tools
         run: ubi --project oalders/is --in /home/runner/.local/bin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installations
         run: |
@@ -92,6 +94,8 @@ jobs:
       - name: Use ubi to install other tools
         run: |
           sudo ubi --project oalders/is --in /usr/sbin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installations
         run: |
@@ -99,3 +103,28 @@ jobs:
           echo "ubi path: ${{ steps.ubi.outputs.path }}"
           is there ubi --verbose
           is there is --verbose
+  alpine:
+    runs-on: ubuntu-latest
+    container: alpine:latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - run: apk add curl
+
+      - name: Install ubi
+        uses: ./
+        id: ubi
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          projects: |
+            oalders/is
+            oalders/debounce -v
+
+      - name: Verify installations
+        run: |
+          is there ubi --verbose
+          is there is --verbose
+          is there debounce --verbose
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
