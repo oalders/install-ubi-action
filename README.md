@@ -4,19 +4,18 @@ This GitHub Action installs [ubi (Universal Binary
 Installer)](https://github.com/houseabsolute/ubi), a nifty tool for downloading
 and installing pre-built binaries from GitHub releases.
 
-`ubi` will be installed into `/home/runner/.local/bin`. After that you can specify the
-path where you'd like to install additional binaries. e.g.
-
-```shell
-sudo ubi --project oalders/is --in /usr/local/bin
-```
-
 ## Usage
 
 ### Basic Usage
 
 ```yaml
-- uses: oalders/install-ubi-action@v0.0.5
+- name: Install ubi, is and debounce
+  uses: oalders/install-ubi-action@v0.0.6
+  with:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    projects: |
+      oalders/is
+      oalders/debounce -v
 ```
 
 ### Complete Workflow Example
@@ -30,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi, is and debounce
-        uses: oalders/install-ubi-action@v0.0.5
+        uses: oalders/install-ubi-action@v0.0.6
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           projects: |
@@ -40,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.5
+        uses: oalders/install-ubi-action@v0.0.6
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.5
+        uses: oalders/install-ubi-action@v0.0.6
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -89,7 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.5
+        uses: oalders/install-ubi-action@v0.0.6
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
