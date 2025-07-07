@@ -35,18 +35,18 @@ runs:
   steps:
     - name: Install ubi
       id: install
-      shell: bash
+      shell: sh
       run: |
-        set -eux -o pipefail
+        set -eux
 
         echo "Installing ubi universal binary installer..."
 
         # If run as non-root, ubi defaults to installing into ~/bin, which is
         # not in the default PATH in GitHub CI. So, we'll default to
         # ~/.local/bin
-        LOCAL_BIN=/home/runner/.local/bin
+        LOCAL_BIN=$HOME/.local/bin
         test -d $LOCAL_BIN || mkdir -p $LOCAL_BIN
-        if [[ "${{ inputs.sudo }}" != "true" && -z "${TARGET:-}" ]]; then
+        if [ "${{ inputs.sudo }}" != "true" ] && [ -z "${TARGET:-}" ]; then
           TARGET=$LOCAL_BIN
           echo "Setting TARGET to ${TARGET}"
           export TARGET
@@ -57,14 +57,26 @@ runs:
         INSTALLER=https://raw.githubusercontent.com/$URL_PATH
 
         # Download and run the bootstrap script
-        if [[ "${{ inputs.sudo }}" == "true" ]]; then
-          if [[ -z "${TARGET:-}" ]]; then
-            curl --silent --location "$INSTALLER" | GITHUB_TOKEN="${{ inputs.GITHUB_TOKEN }}" sudo -E sh
+        if [ "${{ inputs.sudo }}" = "true" ]; then
+          if [ -z "${TARGET:-}" ]; then
+            curl --silent --location "$INSTALLER" | \
+              env GITHUB_TOKEN="${{ inputs.github_token }}" sudo sh
           else
-            curl --silent --location "$INSTALLER" | sudo -E env "TARGET=$TARGET" "GITHUB_TOKEN=${{ inputs.github_token }}" sh
+            curl --silent --location "$INSTALLER" | \
+              sudo env TARGET="$TARGET" GITHUB_TOKEN="${{ inputs.github_token }}" sh
           fi
         else
-          curl --silent --location "$INSTALLER" | env "TARGET=$TARGET" "GITHUB_TOKEN=${{ inputs.GITHUB_TOKEN }}" sh
+          curl --silent --location "$INSTALLER" | \
+            env TARGET="$TARGET" GITHUB_TOKEN="${{ inputs.github_token }}" sh
+        fi
+        if [ ! -z "${TARGET:-}" ]; then
+          if [ ! "$(command -v ubi)" ]; then
+            # Maybe add to PATH for subsequent steps
+            echo "$TARGET" >> $GITHUB_PATH
+
+            # update path for any projects which may need to be installed
+            PATH="$TARGET:$PATH"
+          fi
         fi
 
         # Verify installation
@@ -79,24 +91,24 @@ runs:
           exit 1
         fi
 
-        # Maybe add to PATH for subsequent steps
-        if [[ ! "$(command -v ubi)" ]]; then
-          echo "$(dirname $(which ubi))" >> $GITHUB_PATH
-        fi
-
         # Install additional projects if specified
-        if [[ -n "${{ inputs.projects }}" ]]; then
+        if [ -n "${{ inputs.projects }}" ]; then
           echo "Installing specified projects with ubi..."
 
           # Process each project in the newline-delimited list
           echo "${{ inputs.projects }}" | while read -r project; do
-            if [[ -n "$project" ]]; then
+            if [ -n "$project" ]; then
               echo "Installing $project..."
 
-              if [[ "${{ inputs.sudo }}" == "true" ]]; then
-                sudo -E env "GITHUB_TOKEN=${{ inputs.github_token }}" ubi --project $project
+              if [ "${{ inputs.sudo }}" = "true" ]; then
+                sudo env GITHUB_TOKEN="${{ inputs.github_token }}" ubi --project $project
               else
-                env "GITHUB_TOKEN=${{ inputs.github_token }}" ubi --project $project --in "$TARGET"
+                project_has_in=$(echo "$project" | grep -- "--in" || true)
+                if [ -z "$project_has_in" ] && [ -n "$TARGET" ]; then
+                  env GITHUB_TOKEN="${{ inputs.github_token }}" ubi --project $project --in "$TARGET"
+                else
+                  env GITHUB_TOKEN="${{ inputs.github_token }}" ubi --project $project
+                fi
               fi
 
               echo "✅ Installed $project"
