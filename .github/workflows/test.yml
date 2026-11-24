@@ -149,7 +149,6 @@ jobs:
       - name: Verify installation
         run: |
           [ "${{ steps.ubi.outputs.version }}" = "0.13.0" ]
-          ubi --version
   invalid_version:
     runs-on: ubuntu-latest
     steps:
