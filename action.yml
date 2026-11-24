@@ -99,12 +99,12 @@ runs:
 
         # Verify installation
         # Check the binary we installed, not whatever ubi is earlier on PATH.
-        # TARGET is unset only under sudo, where the bootstrap installs to /usr/local/bin.
+        # With no TARGET (sudo only), the bootstrap installs as root to /usr/local/bin; recheck on COMMIT bumps.
         UBI_PATH="${TARGET:-/usr/local/bin}/ubi"
         if [ -x "$UBI_PATH" ]; then
           UBI_VERSION=$("$UBI_PATH" --version | head -n1 | awk '{print $2}')
           if [ -z "$UBI_VERSION" ]; then
-            echo "❌ $UBI_PATH did not report a version" >&2
+            echo "❌ $UBI_PATH did not report a version"
             exit 1
           fi
           echo "✅ ubi ${UBI_VERSION} installed successfully at ${UBI_PATH}"
