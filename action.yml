@@ -47,7 +47,7 @@ runs:
         INPUT_GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
         INPUT_VERSION: ${{ inputs.version }}
       run: |
-        # -f: $project is word-split on purpose (to carry ubi flags), never globbed.
+        # -f: no globbing anywhere; $project is word-split on purpose to carry ubi flags.
         set -eufx
 
         # An empty tag falls back to latest and a slash can redirect the download path.
