@@ -115,14 +115,14 @@ runs:
           exit 1
         fi
 
-        # Export with xtrace off so the token stays out of the log and out of argv.
-        set +x
-        export GITHUB_TOKEN="$INPUT_GITHUB_TOKEN"
-        set -x
-
         # Install additional projects if specified
         if [ -n "$INPUT_PROJECTS" ]; then
           echo "Installing specified projects with ubi..."
+
+          # Export with xtrace off so the token stays out of the log and out of argv.
+          set +x
+          export GITHUB_TOKEN="$INPUT_GITHUB_TOKEN"
+          set -x
 
           # Process each project in the newline-delimited list
           printf '%s\n' "$INPUT_PROJECTS" | while read -r project; do
