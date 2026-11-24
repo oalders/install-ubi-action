@@ -125,6 +125,13 @@ The ubi release is pinned via `version`; the default is an immutable release.
 Empty values and values containing `/` are rejected. Releases not marked
 immutable can be re-pointed upstream, so prefer immutable ones.
 
+**Note:** each `projects` line is split on whitespace so it can carry ubi
+flags (e.g. `oalders/debounce -v`); glob characters are not expanded. Set
+`projects` only from trusted sources, not issue titles, branch names or
+`workflow_dispatch` inputs: a line can add any ubi argument, including `--url`
+and `--in`, so it can put an arbitrary binary on `PATH` for later steps, and
+with `sudo: true` it does so as root.
+
 ## Outputs
 
 | Output | Description |
