@@ -68,7 +68,7 @@ jobs:
           sudo: true
       - name: Use ubi to install other tools
         run: |
-          sudo ubi --project oalders/is --in /usr/local/bin
+          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --in /usr/local/bin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -99,7 +99,7 @@ jobs:
           TARGET: /usr/local/sbin
       - name: Use ubi to install other tools
         run: |
-          sudo ubi --project oalders/is --in /usr/sbin
+          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --in /usr/sbin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
