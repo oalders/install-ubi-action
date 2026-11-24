@@ -80,12 +80,12 @@ runs:
         curl --fail --show-error --silent --location --output "$INSTALLER_FILE" "$INSTALLER"
         if [ "$INPUT_SUDO" = "true" ]; then
           if [ -z "${TARGET:-}" ]; then
-            sudo env TAG="$INPUT_VERSION" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$INSTALLER_FILE"
+            sudo env TAG="$INPUT_VERSION" sh "$INSTALLER_FILE"
           else
-            sudo env TAG="$INPUT_VERSION" TARGET="$TARGET" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$INSTALLER_FILE"
+            sudo env TAG="$INPUT_VERSION" TARGET="$TARGET" sh "$INSTALLER_FILE"
           fi
         else
-          env TAG="$INPUT_VERSION" TARGET="$TARGET" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$INSTALLER_FILE"
+          env TAG="$INPUT_VERSION" TARGET="$TARGET" sh "$INSTALLER_FILE"
         fi
         if [ ! -z "${TARGET:-}" ]; then
           if [ ! "$(command -v ubi)" ]; then
@@ -115,6 +115,11 @@ runs:
           exit 1
         fi
 
+        # Export with xtrace off so the token stays out of the log and out of argv.
+        set +x
+        export GITHUB_TOKEN="$INPUT_GITHUB_TOKEN"
+        set -x
+
         # Install additional projects if specified
         if [ -n "$INPUT_PROJECTS" ]; then
           echo "Installing specified projects with ubi..."
@@ -125,13 +130,13 @@ runs:
               echo "Installing $project..."
 
               if [ "$INPUT_SUDO" = "true" ]; then
-                sudo env GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" ubi --project $project
+                sudo --preserve-env=GITHUB_TOKEN ubi --project $project
               else
                 project_has_in=$(echo "$project" | grep -- "--in" || true)
                 if [ -z "$project_has_in" ] && [ -n "$TARGET" ]; then
-                  env GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" ubi --project $project --in "$TARGET"
+                  ubi --project $project --in "$TARGET"
                 else
-                  env GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" ubi --project $project
+                  ubi --project $project
                 fi
               fi
 
