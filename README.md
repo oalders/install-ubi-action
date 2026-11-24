@@ -48,7 +48,7 @@ jobs:
         run: |
           ubi --project oalders/is
           ubi --project oalders/debounce
-        with:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installations
@@ -73,7 +73,7 @@ jobs:
       - name: Use ubi to install other tools
         run: |
           sudo ubi --project oalders/is
-        with:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installations
@@ -98,7 +98,7 @@ jobs:
       - name: Use ubi to install other tools
         run: |
           sudo ubi --project oalders/is --in /usr/sbin
-        with:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verify installations
