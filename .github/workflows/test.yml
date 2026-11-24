@@ -117,13 +117,46 @@ jobs:
 
       - name: Install ubi
         uses: ./
+        id: ubi
         continue-on-error: true
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           projects: '$(touch pwned-projects)'
 
+      # ubi on PATH proves the run reached the projects loop.
       - name: Verify projects input was not executed
-        run: test ! -e "$GITHUB_WORKSPACE/pwned-projects"
+        run: |
+          [ "${{ steps.ubi.outcome }}" = failure ]
+          command -v ubi
+          test ! -e "$GITHUB_WORKSPACE/pwned-projects"
+  invalid_version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ubi with empty version
+        uses: ./
+        id: empty
+        continue-on-error: true
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          version: ''
+
+      - name: Install ubi with slash in version
+        uses: ./
+        id: slash
+        continue-on-error: true
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          version: 'v0.13.0/x'
+
+      # No ubi on PATH proves rejection happened before anything installed.
+      - name: Verify invalid versions were rejected
+        run: |
+          [ "${{ steps.empty.outcome }}" = failure ]
+          [ "${{ steps.slash.outcome }}" = failure ]
+          ! command -v ubi
   alpine:
     runs-on: ubuntu-latest
     container: alpine:latest

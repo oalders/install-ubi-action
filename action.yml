@@ -49,9 +49,9 @@ runs:
       run: |
         set -eux
 
-        # A slash would let the tag redirect the bootstrap's download URL path.
+        # An empty tag falls back to latest and a slash can redirect the download path.
         case "$INPUT_VERSION" in
-          */*)
+          ''|*/*)
             echo "Invalid version: $INPUT_VERSION" >&2
             exit 1
             ;;
@@ -70,7 +70,6 @@ runs:
           export TARGET
         fi
 
-        # Bump together with the version input default.
         COMMIT=d9348539c2521f05225618139ea23fd3f54bce46
         URL_PATH="houseabsolute/ubi/$COMMIT/bootstrap/bootstrap-ubi.sh"
         INSTALLER=https://raw.githubusercontent.com/$URL_PATH

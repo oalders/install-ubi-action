@@ -121,8 +121,9 @@ jobs:
 
 **Note:** the bootstrap script is pinned to commit
 `d9348539c2521f05225618139ea23fd3f54bce46` for reproducibility and security.
-The ubi release is pinned via `version`; the default is an immutable release,
-while other values pin a tag only.
+The ubi release is pinned via `version`; the default is an immutable release.
+Empty values and values containing `/` are rejected, and a tag that is not an
+immutable release can be re-pointed upstream.
 
 ## Outputs
 
