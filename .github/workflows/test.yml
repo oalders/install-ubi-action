@@ -184,11 +184,14 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           sudo: true
-          projects: oalders/is
+          projects: |
+            oalders/is
+            oalders/debounce --in /usr/local/sbin
 
       - name: Verify installations
         run: |
           [ "$(command -v is)" = /usr/local/bin/is ]
+          [ "$(command -v debounce)" = /usr/local/sbin/debounce ]
           is there ubi --verbose
   token_not_logged:
     runs-on: ubuntu-latest
@@ -202,6 +205,7 @@ jobs:
           # An empty token would match every line below.
           [ -n "$INPUT_GITHUB_TOKEN" ]
           yq -r '.runs.steps[] | select(.id == "install") | .run' action.yml > "$RUNNER_TEMP/install.sh"
+          [ -s "$RUNNER_TEMP/install.sh" ]
           for sudo in false true; do
             if ! INPUT_SUDO=$sudo sh "$RUNNER_TEMP/install.sh" > "$RUNNER_TEMP/out.log" 2>&1; then
               cat "$RUNNER_TEMP/out.log"

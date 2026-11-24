@@ -46,8 +46,8 @@ jobs:
 
       - name: Use ubi to install "is" and "debounce"
         run: |
-          ubi --project oalders/is
-          ubi --project oalders/debounce
+          ubi --project oalders/is --in "$HOME/.local/bin"
+          ubi --project oalders/debounce --in "$HOME/.local/bin"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
