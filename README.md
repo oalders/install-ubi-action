@@ -132,6 +132,12 @@ flags (e.g. `oalders/debounce -v`); glob characters are not expanded. Set
 and `--in`, so it can put an arbitrary binary on `PATH` for later steps, and
 with `sudo: true` it does so as root.
 
+**Note:** set the `TARGET` environment variable on the step to choose where
+ubi is installed (it defaults to `~/.local/bin` without `sudo`). The directory
+is added to `PATH` for later steps and, with `sudo: true`, written to as root.
+Like `projects`, set it only from trusted sources, not issue titles, branch
+names or `workflow_dispatch` inputs.
+
 ## Outputs
 
 | Output | Description |
