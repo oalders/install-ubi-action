@@ -20,6 +20,11 @@ inputs:
     description: 'GitHub token to use for API requests, helps avoid rate limiting'
     required: false
     default: ''
+  version:
+    description: 'ubi release tag to install, with leading v (e.g. v0.13.0)'
+    required: false
+    # Bump together with COMMIT below, and only to immutable releases.
+    default: 'v0.13.0'
 
 outputs:
   version:
@@ -36,8 +41,21 @@ runs:
     - name: Install ubi
       id: install
       shell: sh
+      env:
+        INPUT_PROJECTS: ${{ inputs.projects }}
+        INPUT_SUDO: ${{ inputs.sudo }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+        INPUT_VERSION: ${{ inputs.version }}
       run: |
         set -eux
+
+        # An empty tag falls back to latest and a slash can redirect the download path.
+        case "$INPUT_VERSION" in
+          ''|*/*)
+            echo "Invalid version: $INPUT_VERSION" >&2
+            exit 1
+            ;;
+        esac
 
         echo "Installing ubi universal binary installer..."
 
@@ -46,7 +64,7 @@ runs:
         # ~/.local/bin
         LOCAL_BIN=$HOME/.local/bin
         test -d $LOCAL_BIN || mkdir -p $LOCAL_BIN
-        if [ "${{ inputs.sudo }}" != "true" ] && [ -z "${TARGET:-}" ]; then
+        if [ "$INPUT_SUDO" != "true" ] && [ -z "${TARGET:-}" ]; then
           TARGET=$LOCAL_BIN
           echo "Setting TARGET to ${TARGET}"
           export TARGET
@@ -57,17 +75,17 @@ runs:
         INSTALLER=https://raw.githubusercontent.com/$URL_PATH
 
         # Download and run the bootstrap script
-        if [ "${{ inputs.sudo }}" = "true" ]; then
+        INSTALLER_FILE=$(mktemp)
+        trap 'rm -f "$INSTALLER_FILE"' EXIT
+        curl --fail --show-error --silent --location --output "$INSTALLER_FILE" "$INSTALLER"
+        if [ "$INPUT_SUDO" = "true" ]; then
           if [ -z "${TARGET:-}" ]; then
-            curl --silent --location "$INSTALLER" | \
-              env GITHUB_TOKEN="${{ inputs.github_token }}" sudo sh
+            sudo env TAG="$INPUT_VERSION" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$INSTALLER_FILE"
           else
-            curl --silent --location "$INSTALLER" | \
-              sudo env TARGET="$TARGET" GITHUB_TOKEN="${{ inputs.github_token }}" sh
+            sudo env TAG="$INPUT_VERSION" TARGET="$TARGET" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$INSTALLER_FILE"
           fi
         else
-          curl --silent --location "$INSTALLER" | \
-            env TARGET="$TARGET" GITHUB_TOKEN="${{ inputs.github_token }}" sh
+          env TAG="$INPUT_VERSION" TARGET="$TARGET" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$INSTALLER_FILE"
         fi
         if [ ! -z "${TARGET:-}" ]; then
           if [ ! "$(command -v ubi)" ]; then
@@ -92,22 +110,22 @@ runs:
         fi
 
         # Install additional projects if specified
-        if [ -n "${{ inputs.projects }}" ]; then
+        if [ -n "$INPUT_PROJECTS" ]; then
           echo "Installing specified projects with ubi..."
 
           # Process each project in the newline-delimited list
-          echo "${{ inputs.projects }}" | while read -r project; do
+          printf '%s\n' "$INPUT_PROJECTS" | while read -r project; do
             if [ -n "$project" ]; then
               echo "Installing $project..."
 
-              if [ "${{ inputs.sudo }}" = "true" ]; then
-                sudo env GITHUB_TOKEN="${{ inputs.github_token }}" ubi --project $project
+              if [ "$INPUT_SUDO" = "true" ]; then
+                sudo env GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" ubi --project $project
               else
                 project_has_in=$(echo "$project" | grep -- "--in" || true)
                 if [ -z "$project_has_in" ] && [ -n "$TARGET" ]; then
-                  env GITHUB_TOKEN="${{ inputs.github_token }}" ubi --project $project --in "$TARGET"
+                  env GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" ubi --project $project --in "$TARGET"
                 else
-                  env GITHUB_TOKEN="${{ inputs.github_token }}" ubi --project $project
+                  env GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" ubi --project $project
                 fi
               fi
 
