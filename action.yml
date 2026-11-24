@@ -75,17 +75,17 @@ runs:
         INSTALLER=https://raw.githubusercontent.com/$URL_PATH
 
         # Download and run the bootstrap script
-        installer=$(mktemp)
-        trap 'rm -f "$installer"' EXIT
-        curl --fail --show-error --silent --location --output "$installer" "$INSTALLER"
+        INSTALLER_FILE=$(mktemp)
+        trap 'rm -f "$INSTALLER_FILE"' EXIT
+        curl --fail --show-error --silent --location --output "$INSTALLER_FILE" "$INSTALLER"
         if [ "$INPUT_SUDO" = "true" ]; then
           if [ -z "${TARGET:-}" ]; then
-            sudo env TAG="$INPUT_VERSION" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$installer"
+            sudo env TAG="$INPUT_VERSION" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$INSTALLER_FILE"
           else
-            sudo env TAG="$INPUT_VERSION" TARGET="$TARGET" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$installer"
+            sudo env TAG="$INPUT_VERSION" TARGET="$TARGET" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$INSTALLER_FILE"
           fi
         else
-          env TAG="$INPUT_VERSION" TARGET="$TARGET" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$installer"
+          env TAG="$INPUT_VERSION" TARGET="$TARGET" GITHUB_TOKEN="$INPUT_GITHUB_TOKEN" sh "$INSTALLER_FILE"
         fi
         if [ ! -z "${TARGET:-}" ]; then
           if [ ! "$(command -v ubi)" ]; then
