@@ -128,15 +128,17 @@ runs:
             if [ -n "$project" ]; then
               echo "Installing $project..."
 
-              if [ "$INPUT_SUDO" = "true" ]; then
-                sudo --preserve-env=GITHUB_TOKEN "$UBI_PATH" --project $project
+              # ubi defaults --in to ./bin, so install beside ubi unless the line names a dir.
+              project_has_in=$(echo "$project" | grep -- "--in" || true)
+              if [ -n "$project_has_in" ]; then
+                set -- --project $project
               else
-                project_has_in=$(echo "$project" | grep -- "--in" || true)
-                if [ -z "$project_has_in" ] && [ -n "$TARGET" ]; then
-                  "$UBI_PATH" --project $project --in "$TARGET"
-                else
-                  "$UBI_PATH" --project $project
-                fi
+                set -- --project $project --in "${TARGET:-/usr/local/bin}"
+              fi
+              if [ "$INPUT_SUDO" = "true" ]; then
+                sudo --preserve-env=GITHUB_TOKEN "$UBI_PATH" "$@"
+              else
+                "$UBI_PATH" "$@"
               fi
 
               echo "✅ Installed $project"
