@@ -149,6 +149,30 @@ jobs:
       - name: Verify installation
         run: |
           [ "${{ steps.ubi.outputs.version }}" = "0.13.0" ]
+
+  shadowed_ubi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Put a broken ubi first on PATH
+        run: |
+          mkdir -p "$RUNNER_TEMP/shadow"
+          printf '#!/bin/sh\nexit 1\n' > "$RUNNER_TEMP/shadow/ubi"
+          chmod +x "$RUNNER_TEMP/shadow/ubi"
+          echo "$RUNNER_TEMP/shadow" >> "$GITHUB_PATH"
+
+      - name: Install ubi
+        uses: ./
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          projects: oalders/is
+
+      - name: Verify the installed ubi wins on PATH
+        run: |
+          [ "$(command -v ubi)" = "$HOME/.local/bin/ubi" ]
+          is there is --verbose
   invalid_version:
     runs-on: ubuntu-latest
     steps:
