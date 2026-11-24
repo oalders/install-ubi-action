@@ -117,9 +117,12 @@ jobs:
 | `projects` | Newline-delimited list of projects to install using ubi | No | `''` |
 | `sudo` | Whether to use sudo for installation | No | `false` |
 | `GITHUB_TOKEN` | GitHub token to use for API requests, helps avoid rate limiting | No | `''` |
+| `version` | ubi release tag to install, with leading `v` | No | `v0.13.0` |
 
 **Note:** the bootstrap script is pinned to commit
 `d9348539c2521f05225618139ea23fd3f54bce46` for reproducibility and security.
+The ubi release is pinned via `version`; the default is an immutable release,
+while other values pin a tag only.
 
 ## Outputs
 
