@@ -134,7 +134,7 @@ with `sudo: true` it does so as root.
 
 **Note:** set the `TARGET` environment variable to choose where ubi is
 installed (by default `~/.local/bin`, or `/usr/local/bin` with `sudo: true`);
-without `sudo`, `projects` are installed there too. A `TARGET` directory goes
+`projects` are installed there too. A `TARGET` directory goes
 first on `PATH` for later steps, so it can shadow system binaries, and with
 `sudo: true` it is written to as root. Like `projects`, set it only from
 trusted sources, not issue titles, branch names or `workflow_dispatch` inputs.
