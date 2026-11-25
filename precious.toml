@@ -1,0 +1,6 @@
+[commands.shellcheck]
+type = "lint"
+include = ["**/*.sh"]
+cmd = ["shellcheck"]
+ok-exit-codes = [0]
+lint-failure-exit-codes = [1]
