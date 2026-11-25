@@ -32,6 +32,13 @@ case "${TARGET:-}" in
     ;;
 esac
 
+# awk can't tell a missing checksum file from an unlisted tag, so check it first.
+SUMS="$(dirname "$0")/ubi-checksums.txt"
+if [ ! -r "$SUMS" ]; then
+  echo "❌ $SUMS is missing or unreadable"
+  exit 1
+fi
+
 COMMIT=d9348539c2521f05225618139ea23fd3f54bce46
 URL_PATH="houseabsolute/ubi/$COMMIT/bootstrap/bootstrap-ubi.sh"
 INSTALLER=https://raw.githubusercontent.com/$URL_PATH
@@ -68,12 +75,13 @@ fi
 UBI_PATH="${TARGET:-/usr/local/bin}/ubi"
 if [ -x "$UBI_PATH" ]; then
   # The bootstrap checks nothing it downloads, so check the binary before running it.
+  # No pipe, so a hashing failure stops the script under set -e.
   if command -v sha256sum >/dev/null; then
-    UBI_SHA=$(sha256sum "$UBI_PATH" | cut -d' ' -f1)
+    UBI_SHA=$(sha256sum "$UBI_PATH")
   else
-    UBI_SHA=$(shasum -a 256 "$UBI_PATH" | cut -d' ' -f1)
+    UBI_SHA=$(shasum -a 256 "$UBI_PATH")
   fi
-  SUMS="$(dirname "$0")/ubi-checksums.txt"
+  UBI_SHA=${UBI_SHA%% *}
   if ! V="$INPUT_VERSION" awk '$1 == ENVIRON["V"] { f = 1 } END { exit !f }' "$SUMS"; then
     echo "::warning::ubi $INPUT_VERSION is not in ubi-checksums.txt, so its checksum was not verified"
   elif ! V="$INPUT_VERSION" H="$UBI_SHA" \

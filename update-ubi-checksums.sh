@@ -11,7 +11,12 @@ trap 'rm -rf "$work"' EXIT
 
 gh api "repos/houseabsolute/ubi/releases/tags/$version" \
   --jq '.assets[].name | select(endswith(".tar.gz"))' > "$work/assets"
+if [ ! -s "$work/assets" ]; then
+  echo "$version has no .tar.gz assets" >&2
+  exit 1
+fi
 
+# Print nothing until every asset checks out, so a failure can't append a partial list.
 while read -r asset; do
   curl --fail --silent --show-error --location --output "$work/$asset" "$base/$asset"
   curl --fail --silent --show-error --location --output "$work/sum" "$base/$asset.sha256"
@@ -22,6 +27,7 @@ while read -r asset; do
     exit 1
   fi
   tar -xzf "$work/$asset" -C "$work" ubi
-  echo "$version $(sha256sum "$work/ubi" | cut -d' ' -f1) $asset"
+  echo "$version $(sha256sum "$work/ubi" | cut -d' ' -f1) $asset" >> "$work/out"
   rm -f "$work/ubi" "$work/$asset"
 done < "$work/assets"
+cat "$work/out"

@@ -23,8 +23,8 @@ inputs:
   version:
     description: 'ubi release tag to install, with leading v (e.g. v0.13.0)'
     required: false
-    # Bump only to immutable releases, adding them to ubi-checksums.txt; see also
-    # COMMIT in install-ubi.sh.
+    # Bump only to immutable releases, together with COMMIT in install-ubi.sh, and
+    # add them to ubi-checksums.txt with update-ubi-checksums.sh.
     default: 'v0.13.0'
 
 outputs:
