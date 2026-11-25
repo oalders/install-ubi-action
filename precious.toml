@@ -4,3 +4,13 @@ include = ["**/*.sh"]
 cmd = ["shellcheck"]
 ok-exit-codes = [0]
 lint-failure-exit-codes = [1]
+
+[commands.zizmor]
+type = "lint"
+include = [".github/**/*.yml", "action.yml"]
+invoke = "once"
+path-args = "none"
+cmd = ["zizmor", "-qq", "."]
+ok-exit-codes = [0]
+# zizmor exits 10 plus the highest finding severity.
+lint-failure-exit-codes = [10, 11, 12, 13, 14]

@@ -1,0 +1,4 @@
+rules:
+  # The tests run `uses: ./` on purpose: it is the action as checked out for the run.
+  self-repository:
+    disable: true

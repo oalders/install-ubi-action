@@ -26,13 +26,17 @@ jobs:
           persist-credentials: false
 
       # Pinned so a new upstream release can't turn lint red on its own.
-      - name: Install precious and shellcheck
+      - name: Install precious, shellcheck and zizmor
         uses: ./
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           projects: |
             houseabsolute/precious --tag v1.0.0
             koalaman/shellcheck --tag v0.11.0
+            zizmorcore/zizmor --tag v1.32.0
 
       - name: precious lint
         run: precious lint -q --all
+        env:
+          # zizmor's online audits (impostor commits, known-vulnerable actions) need it.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
