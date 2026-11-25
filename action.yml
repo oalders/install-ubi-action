@@ -90,14 +90,10 @@ runs:
         else
           env TAG="$INPUT_VERSION" TARGET="$TARGET" sh "$INSTALLER_FILE"
         fi
-        if [ ! -z "${TARGET:-}" ]; then
-          if [ ! "$(command -v ubi)" ]; then
-            # Maybe add to PATH for subsequent steps
-            echo "$TARGET" >> $GITHUB_PATH
-
-            # update path for any projects which may need to be installed
-            PATH="$TARGET:$PATH"
-          fi
+        # Put TARGET first even if another ubi is on PATH, so later steps get this one.
+        if [ -n "${TARGET:-}" ]; then
+          echo "$TARGET" >> $GITHUB_PATH
+          PATH="$TARGET:$PATH"
         fi
 
         # Verify installation
@@ -133,13 +129,13 @@ runs:
               echo "Installing $project..."
 
               if [ "$INPUT_SUDO" = "true" ]; then
-                sudo --preserve-env=GITHUB_TOKEN ubi --project $project
+                sudo --preserve-env=GITHUB_TOKEN "$UBI_PATH" --project $project
               else
                 project_has_in=$(echo "$project" | grep -- "--in" || true)
                 if [ -z "$project_has_in" ] && [ -n "$TARGET" ]; then
-                  ubi --project $project --in "$TARGET"
+                  "$UBI_PATH" --project $project --in "$TARGET"
                 else
-                  ubi --project $project
+                  "$UBI_PATH" --project $project
                 fi
               fi
 
