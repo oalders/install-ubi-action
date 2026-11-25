@@ -343,15 +343,16 @@ jobs:
       # No ubi on PATH proves rejection happened before anything installed.
       - name: Verify invalid versions were rejected
         run: |
-          [ "$EMPTY" = failure ]
-          [ "$SLASH" = failure ]
+          [ "$EMPTY_OUTCOME" = failure ]
+          [ "$SLASH_OUTCOME" = failure ]
           if command -v ubi; then exit 1; fi
         env:
-          EMPTY: ${{ steps.empty.outcome }}
-          SLASH: ${{ steps.slash.outcome }}
+          EMPTY_OUTCOME: ${{ steps.empty.outcome }}
+          SLASH_OUTCOME: ${{ steps.slash.outcome }}
   alpine:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Pinned so a new Alpine release can't change this job on its own.
     container: alpine:3.24
     steps:
       - name: Checkout repository
