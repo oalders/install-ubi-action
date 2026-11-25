@@ -54,7 +54,7 @@ jobs:
           [ "${{ steps.ubi.outputs.version }}" = "0.12.0" ]
           is there ubi --verbose
           is there is --verbose
-          is known summary var --md >> $GITHUB_STEP_SUMMARY
+          is known summary var --md >> "$GITHUB_STEP_SUMMARY"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sudo:
@@ -82,7 +82,7 @@ jobs:
           [ "${{ steps.ubi.outputs.version }}" = "0.13.0" ]
           is there ubi --verbose
           is there is --verbose
-          sudo is known summary var --md >> $GITHUB_STEP_SUMMARY
+          sudo is known summary var --md >> "$GITHUB_STEP_SUMMARY"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -204,10 +204,8 @@ jobs:
         run: |
           # An empty token would match every line below.
           [ -n "$INPUT_GITHUB_TOKEN" ]
-          yq -r '.runs.steps[] | select(.id == "install") | .run' action.yml > "$RUNNER_TEMP/install.sh"
-          [ -s "$RUNNER_TEMP/install.sh" ]
           for sudo in false true; do
-            if ! INPUT_SUDO=$sudo sh "$RUNNER_TEMP/install.sh" > "$RUNNER_TEMP/out.log" 2>&1; then
+            if ! INPUT_SUDO=$sudo sh ./install-ubi.sh > "$RUNNER_TEMP/out.log" 2>&1; then
               cat "$RUNNER_TEMP/out.log"
               exit 1
             fi
@@ -220,6 +218,26 @@ jobs:
         env:
           INPUT_PROJECTS: oalders/is
           INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_VERSION: v0.13.0
+  home_with_space:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Unquoted, these paths are word-split and the default TARGET is never created.
+      - name: Run the install script with a space in HOME
+        run: |
+          export HOME="$RUNNER_TEMP/home dir"
+          mkdir -p "$HOME"
+          export GITHUB_OUTPUT="$HOME/output" GITHUB_PATH="$HOME/path"
+          sh ./install-ubi.sh
+          grep -qxF "path=$HOME/.local/bin/ubi" "$GITHUB_OUTPUT"
+          grep -qxF "$HOME/.local/bin" "$GITHUB_PATH"
+        env:
+          INPUT_PROJECTS: ''
+          INPUT_SUDO: 'false'
+          INPUT_GITHUB_TOKEN: ''
           INPUT_VERSION: v0.13.0
   projects_glob:
     runs-on: ubuntu-latest
