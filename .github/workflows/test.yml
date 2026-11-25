@@ -428,3 +428,56 @@ jobs:
           INPUT_SUDO: 'true'
           INPUT_GITHUB_TOKEN: ''
           INPUT_VERSION: v0.13.0
+  checksum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Stands in for a re-pointed release: the binary no longer matches.
+      - name: Replace the v0.13.0 checksums
+        run: sed -i 's/^v0\.13\.0 [0-9a-f]*/v0.13.0 0000/' ubi-checksums.txt
+
+      - name: Install ubi with a mismatched checksum
+        uses: ./
+        id: mismatch
+        continue-on-error: true
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify the mismatched binary was rejected and removed
+        run: |
+          [ "$OUTCOME" = failure ]
+          test ! -e "$HOME/.local/bin/ubi"
+        env:
+          OUTCOME: ${{ steps.mismatch.outcome }}
+
+      - name: Install ubi with sudo and a mismatched checksum
+        uses: ./
+        id: mismatch_sudo
+        continue-on-error: true
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          sudo: true
+
+      - name: Verify the root-owned mismatched binary was removed
+        run: |
+          [ "$OUTCOME" = failure ]
+          test ! -e /usr/local/bin/ubi
+        env:
+          OUTCOME: ${{ steps.mismatch_sudo.outcome }}
+
+      - name: Install a ubi release with no checksums listed
+        uses: ./
+        id: unlisted
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          version: v0.10.0
+
+      - name: Verify the unlisted release installed
+        run: '[ "$VERSION" = "0.10.0" ]'
+        env:
+          VERSION: ${{ steps.unlisted.outputs.version }}
