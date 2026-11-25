@@ -132,6 +132,23 @@ jobs:
           [ "${{ steps.ubi.outcome }}" = failure ]
           command -v ubi
           test ! -e "$GITHUB_WORKSPACE/pwned-projects"
+  stray_filename:
+    runs-on: ubuntu-latest
+    env:
+      FILENAME: not-a-real-asset.tar.gz
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install ubi
+        uses: ./
+        id: ubi
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify installation
+        run: |
+          [ "${{ steps.ubi.outputs.version }}" = "0.13.0" ]
   invalid_version:
     runs-on: ubuntu-latest
     steps:

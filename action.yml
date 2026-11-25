@@ -79,6 +79,8 @@ runs:
         INSTALLER_FILE=$(mktemp)
         trap 'rm -f "$INSTALLER_FILE"' EXIT
         curl --fail --show-error --silent --location --output "$INSTALLER_FILE" "$INSTALLER"
+        # A caller's FILENAME would make the bootstrap fetch that asset instead of deriving one.
+        unset FILENAME
         if [ "$INPUT_SUDO" = "true" ]; then
           if [ -z "${TARGET:-}" ]; then
             sudo env TAG="$INPUT_VERSION" sh "$INSTALLER_FILE"
