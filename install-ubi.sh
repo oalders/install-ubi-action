@@ -40,7 +40,7 @@ INSTALLER=https://raw.githubusercontent.com/$URL_PATH
 INSTALLER_FILE=$(mktemp)
 trap 'rm -f "$INSTALLER_FILE"' EXIT
 curl --fail --show-error --silent --location --output "$INSTALLER_FILE" "$INSTALLER"
-# Run the bootstrap with only what it and its curl need: a caller's FILENAME or
+# Run the bootstrap with only what it and its tools need: a caller's FILENAME or
 # TAR_OPTIONS would change what it fetches or extracts.
 set -- TAG="$INPUT_VERSION"
 [ -z "${TARGET:-}" ] || set -- "$@" TARGET="$TARGET"

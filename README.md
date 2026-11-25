@@ -140,6 +140,12 @@ system binaries, and with `sudo: true` it is written to as root. Like
 `projects`, set it only from trusted sources, not issue titles, branch names
 or `workflow_dispatch` inputs.
 
+**Note:** the bootstrap runs with only the environment it needs: `PATH`,
+`HOME`, `TARGET`, `UBI_DEBUG_BOOTSTRAP`, and the proxy, CA bundle and
+`TMPDIR` settings. With `sudo: true` it runs as root with a fixed `PATH` and none of
+the proxy or CA settings, so the bootstrap can't reach GitHub through a proxy
+that requires them.
+
 ## Outputs
 
 | Output | Description |
