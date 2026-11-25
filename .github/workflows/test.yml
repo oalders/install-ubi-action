@@ -225,16 +225,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # Unquoted, the default TARGET under HOME is word-split and never created.
+      # Unquoted, these paths are word-split and the default TARGET is never created.
       - name: Run the install script with a space in HOME
         run: |
-          HOME="$RUNNER_TEMP/home dir" sh ./install-ubi.sh
-          grep -qxF "path=$RUNNER_TEMP/home dir/.local/bin/ubi" "$GITHUB_OUTPUT"
-          grep -qxF "$RUNNER_TEMP/home dir/.local/bin" "$GITHUB_PATH"
+          export HOME="$RUNNER_TEMP/home dir"
+          mkdir -p "$HOME"
+          export GITHUB_OUTPUT="$HOME/output" GITHUB_PATH="$HOME/path"
+          sh ./install-ubi.sh
+          grep -qxF "path=$HOME/.local/bin/ubi" "$GITHUB_OUTPUT"
+          grep -qxF "$HOME/.local/bin" "$GITHUB_PATH"
         env:
           INPUT_PROJECTS: ''
           INPUT_SUDO: 'false'
-          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_GITHUB_TOKEN: ''
           INPUT_VERSION: v0.13.0
   projects_glob:
     runs-on: ubuntu-latest

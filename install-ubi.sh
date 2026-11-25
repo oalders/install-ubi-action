@@ -96,4 +96,3 @@ if [ -n "$INPUT_PROJECTS" ]; then
     fi
   done
 fi
-
