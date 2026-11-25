@@ -88,6 +88,8 @@ if [ -x "$UBI_PATH" ]; then
   else
     UBI_SHA=$(run shasum -a 256 "$UBI_PATH") || reject "could not hash $UBI_PATH"
   fi
+  # sha256sum prefixes the line with a backslash when the path contains one.
+  UBI_SHA=${UBI_SHA#\\}
   UBI_SHA=${UBI_SHA%% *}
   # Appending "" forces a string comparison: all-digit values would otherwise compare as numbers.
   if ! V="$INPUT_VERSION" awk '$1 "" == ENVIRON["V"] "" { f = 1 } END { exit !f }' "$SUMS"; then

@@ -455,6 +455,21 @@ jobs:
         env:
           OUTCOME: ${{ steps.mismatch.outcome }}
 
+      - name: Install ubi with sudo and a mismatched checksum
+        uses: ./
+        id: mismatch_sudo
+        continue-on-error: true
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          sudo: true
+
+      - name: Verify the root-owned mismatched binary was removed
+        run: |
+          [ "$OUTCOME" = failure ]
+          test ! -e /usr/local/bin/ubi
+        env:
+          OUTCOME: ${{ steps.mismatch_sudo.outcome }}
+
       - name: Install a ubi release with no checksums listed
         uses: ./
         id: unlisted
