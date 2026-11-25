@@ -1,7 +1,7 @@
 ---
 name: 'Install ubi (Universal Binary Installer)'
 description: 'Installs ubi, a tool for installing pre-built binaries'
-author: 'Your Name'
+author: 'Olaf Alders'
 
 branding:
   icon: 'download'
