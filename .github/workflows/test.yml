@@ -8,9 +8,12 @@ permissions:
 jobs:
   minimal:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install ubi
         uses: ./
@@ -19,8 +22,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           sudo: 'false$(touch pwned)'
           projects: |
-            oalders/is
-            oalders/debounce -v
+            oalders/is --tag v0.14.3
+            oalders/debounce --tag v0.5.2 -v
 
       - name: Verify installations
         run: |
@@ -33,9 +36,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   no_sudo:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install ubi
         uses: ./
@@ -45,7 +51,7 @@ jobs:
           version: v0.12.0
 
       - name: Use ubi to install other tools
-        run: ubi --project oalders/is --in /home/runner/.local/bin
+        run: ubi --project oalders/is --tag v0.14.3 --in /home/runner/.local/bin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -59,9 +65,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sudo:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install ubi
         uses: ./
@@ -71,7 +80,7 @@ jobs:
           sudo: true
       - name: Use ubi to install other tools
         run: |
-          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --in /usr/local/bin
+          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --tag v0.14.3 --in /usr/local/bin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -88,9 +97,12 @@ jobs:
 
   sudo_with_target:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install ubi
         uses: ./
@@ -102,7 +114,7 @@ jobs:
           TARGET: /usr/local/sbin
       - name: Use ubi to install other tools
         run: |
-          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --in /usr/local/sbin
+          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --tag v0.14.3 --in /usr/local/sbin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -114,9 +126,12 @@ jobs:
           is there is --verbose
   projects_injection:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install ubi
         uses: ./
@@ -134,11 +149,14 @@ jobs:
           test ! -e "$GITHUB_WORKSPACE/pwned-projects"
   stray_filename:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       FILENAME: not-a-real-asset.tar.gz
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install ubi
         uses: ./
@@ -152,9 +170,12 @@ jobs:
 
   shadowed_ubi:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Put a broken ubi first on PATH
         run: |
@@ -167,7 +188,7 @@ jobs:
         uses: ./
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          projects: oalders/is
+          projects: oalders/is --tag v0.14.3
 
       - name: Verify the installed ubi wins on PATH
         run: |
@@ -175,9 +196,12 @@ jobs:
           is there is --verbose
   sudo_projects:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install ubi
         uses: ./
@@ -185,19 +209,23 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           sudo: true
           projects: |
-            oalders/is
-            oalders/debounce -i /usr/local/sbin
+            oalders/is --tag v0.14.3
+            oalders/debounce --tag v0.5.2 -i /usr/local/sbin
 
       - name: Verify installations
         run: |
           [ "$(command -v is)" = /usr/local/bin/is ]
-          [ "$(command -v debounce)" = /usr/local/sbin/debounce ]
+          # Checked directly: /usr/local/sbin on PATH is a runner-image detail.
+          [ -x /usr/local/sbin/debounce ]
           is there ubi --verbose
   token_not_logged:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       # The runner masks the token in its own log, so capture the raw output to check it.
       - name: Run the install script with output captured
@@ -216,14 +244,17 @@ jobs:
             fi
           done
         env:
-          INPUT_PROJECTS: oalders/is
+          INPUT_PROJECTS: oalders/is --tag v0.14.3
           INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_VERSION: v0.13.0
   home_with_space:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       # Unquoted, these paths are word-split and the default TARGET is never created.
       - name: Run the install script with a space in HOME
@@ -241,9 +272,12 @@ jobs:
           INPUT_VERSION: v0.13.0
   projects_glob:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       # A glob would expand to this path and install oalders/is.
       - run: mkdir -p oalders/is
@@ -264,9 +298,12 @@ jobs:
           if command -v is; then exit 1; fi
   invalid_version:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install ubi with empty version
         uses: ./
@@ -292,10 +329,13 @@ jobs:
           if command -v ubi; then exit 1; fi
   alpine:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     container: alpine:latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - run: apk add curl
 
@@ -305,8 +345,8 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           projects: |
-            oalders/is -v
-            oalders/debounce -v
+            oalders/is --tag v0.14.3 -v
+            oalders/debounce --tag v0.5.2 -v
 
       - name: Verify installations
         run: |
@@ -315,3 +355,70 @@ jobs:
           is there debounce --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  target_newline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The bootstrap rejects a missing TARGET, so without the guard these let it
+      # reach the GITHUB_PATH write the test is about.
+      - name: Create the TARGET directories
+        run: |
+          mkdir -p "$LF_TARGET" "$CR_TARGET"
+        env:
+          LF_TARGET: "/tmp/ubi-lf\n/tmp/injected-lf"
+          CR_TARGET: "/tmp/ubi-cr\r/tmp/injected-cr"
+
+      - name: Install ubi with a newline in TARGET
+        uses: ./
+        id: lf
+        continue-on-error: true
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          TARGET: "/tmp/ubi-lf\n/tmp/injected-lf"
+
+      - name: Install ubi with a carriage return in TARGET
+        uses: ./
+        id: cr
+        continue-on-error: true
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          TARGET: "/tmp/ubi-cr\r/tmp/injected-cr"
+
+      # A line-based GITHUB_PATH write would have added the second path.
+      - name: Verify both were rejected before touching PATH
+        run: |
+          [ "$LF_OUTCOME" = failure ]
+          [ "$CR_OUTCOME" = failure ]
+          case ":$PATH:" in *injected*) exit 1 ;; esac
+        env:
+          LF_OUTCOME: ${{ steps.lf.outcome }}
+          CR_OUTCOME: ${{ steps.cr.outcome }}
+  sudo_no_local_bin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # A fresh HOME, because the runner's own ~/.local/bin may already exist.
+      - name: Run the install script with sudo and no TARGET
+        run: |
+          export HOME="$RUNNER_TEMP/home"
+          mkdir -p "$HOME"
+          export GITHUB_OUTPUT="$HOME/output" GITHUB_PATH="$HOME/path"
+          sh ./install-ubi.sh
+          test ! -e "$HOME/.local/bin"
+        env:
+          INPUT_PROJECTS: ''
+          INPUT_SUDO: 'true'
+          INPUT_GITHUB_TOKEN: ''
+          INPUT_VERSION: v0.13.0
