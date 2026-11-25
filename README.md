@@ -144,8 +144,8 @@ or `workflow_dispatch` inputs.
 `sudo` that is `PATH`, `HOME`, `TARGET`, `UBI_DEBUG_BOOTSTRAP` (any non-empty
 value turns on its debug output), and any proxy, CA bundle and `TMPDIR`
 settings. With `sudo: true` it runs as root with a fixed `PATH`, `TARGET` and
-`UBI_DEBUG_BOOTSTRAP` only, so a runner that needs a proxy or custom CA to
-reach GitHub can't use `sudo: true`.
+`UBI_DEBUG_BOOTSTRAP` only, so a runner that relies on proxy or CA environment
+variables to reach GitHub can't use `sudo: true`.
 
 ## Outputs
 
