@@ -61,17 +61,28 @@ else
   env -i PATH="$PATH" HOME="$HOME" "$@" sh "$INSTALLER_FILE"
   set -x
 fi
-# Put TARGET first even if another ubi is on PATH, so later steps get this one.
-if [ -n "${TARGET:-}" ]; then
-  echo "$TARGET" >> "$GITHUB_PATH"
-  PATH="$TARGET:$PATH"
-fi
 
 # Verify installation
 # Check the binary we installed, not whatever ubi is earlier on PATH.
 # With no TARGET (sudo only), the bootstrap installs as root to /usr/local/bin; recheck on COMMIT bumps.
 UBI_PATH="${TARGET:-/usr/local/bin}/ubi"
 if [ -x "$UBI_PATH" ]; then
+  # The bootstrap checks nothing it downloads, so check the binary before running it.
+  if command -v sha256sum >/dev/null; then
+    UBI_SHA=$(sha256sum "$UBI_PATH" | cut -d' ' -f1)
+  else
+    UBI_SHA=$(shasum -a 256 "$UBI_PATH" | cut -d' ' -f1)
+  fi
+  SUMS="$(dirname "$0")/ubi-checksums.txt"
+  if ! V="$INPUT_VERSION" awk '$1 == ENVIRON["V"] { f = 1 } END { exit !f }' "$SUMS"; then
+    echo "::warning::ubi $INPUT_VERSION is not in ubi-checksums.txt, so its checksum was not verified"
+  elif ! V="$INPUT_VERSION" H="$UBI_SHA" \
+    awk '$1 == ENVIRON["V"] && $2 == ENVIRON["H"] { f = 1 } END { exit !f }' "$SUMS"; then
+    echo "❌ $UBI_PATH (sha256 $UBI_SHA) does not match any ubi $INPUT_VERSION checksum in ubi-checksums.txt"
+    # Remove it, as TARGET may already be on PATH.
+    if [ "$INPUT_SUDO" = "true" ]; then sudo rm -f "$UBI_PATH"; else rm -f "$UBI_PATH"; fi
+    exit 1
+  fi
   UBI_VERSION=$("$UBI_PATH" --version | head -n1 | awk '{print $2}')
   if [ -z "$UBI_VERSION" ]; then
     echo "❌ $UBI_PATH did not report a version"
@@ -83,6 +94,12 @@ if [ -x "$UBI_PATH" ]; then
 else
   echo "❌ Failed to install ubi"
   exit 1
+fi
+
+# Put TARGET first even if another ubi is on PATH, so later steps get this one.
+if [ -n "${TARGET:-}" ]; then
+  echo "$TARGET" >> "$GITHUB_PATH"
+  PATH="$TARGET:$PATH"
 fi
 
 # Install additional projects if specified

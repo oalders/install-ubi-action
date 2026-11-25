@@ -1,0 +1,28 @@
+# <tag> <sha256 of the extracted ubi binary> <release asset>
+# Add a release with: sh update-ubi-checksums.sh <tag> >> ubi-checksums.txt
+v0.12.0 695d55467f3ca06dde8eff6872ee007d7b3d04989573d5f4cc4a8437eb2a9710 ubi-FreeBSD-x86_64.tar.gz
+v0.12.0 1b9edb71e021fddd5d0b307272628d684a9e3d93e44c741accf0f5e12a4e6bc1 ubi-Linux-gnu-powerpc.tar.gz
+v0.12.0 0fa2d4ab5ed60a4e015d4c5b0aed35ab46985cae9d56df99f7ecbb50f578c157 ubi-Linux-gnu-powerpc64.tar.gz
+v0.12.0 7ed58a47954bf344adc2734145f5686c522125fcc7e6f3d6e1f90433a19bfb00 ubi-Linux-gnu-powerpc64le.tar.gz
+v0.12.0 5b9a73f2f1a2798dd474840358c83d81a32c731a6a8563b0a8e054034fbbbc56 ubi-Linux-gnu-riscv64gc.tar.gz
+v0.12.0 e3ca3d7e0f670a9be3df571367e3020d1c4a2fd0d6754e0b3e97785a271a243b ubi-Linux-gnu-s390x.tar.gz
+v0.12.0 20ee6bbfeda7c918dd14d8eacf82832dcd7e1027770cac9eef3aa0acc92b7bfc ubi-Linux-musl-arm64.tar.gz
+v0.12.0 85223d31ef526d645759f958c1088e728e84634c4e458becaa16b7c37c91527e ubi-Linux-musl-i686.tar.gz
+v0.12.0 7e66deb7df9538dec1fbde5ac3b40ccd285a4020cb464855d509556ca5eef4fd ubi-Linux-musl-x86_64.tar.gz
+v0.12.0 9e544653c36b28338d6bbed5a842741ecb958da8e364a217c6830a77ce80f3b7 ubi-Linux-musleabi-arm.tar.gz
+v0.12.0 308f03dceaee77436ceeedcdc38d7db092e684de5201ad19c17ff36710afffe9 ubi-macOS-arm64.tar.gz
+v0.12.0 b047bfb1e2828db58dacc41cbb0a96bedd06de51554cf60545b3d4d651e8728e ubi-macOS-x86_64.tar.gz
+v0.12.0 837b3eae706f9ce6a89ac6da8e716aa0bb62a85af816405d67233c2f9bc1526e ubi-NetBSD-x86_64.tar.gz
+v0.13.0 f203af2a8ebf97e1b332638e8722ff3de89e7016f5695883e4464020ff7d80c2 ubi-FreeBSD-x86_64.tar.gz
+v0.13.0 24cf2433ee9fef5e1cbbe1cafdceac4bf984752fdaf50a8035675446cccd37ae ubi-Linux-gnu-powerpc.tar.gz
+v0.13.0 c3cf5ff1b05f0afaa3a3c6124e021d730a228e48abe0834ac88b917a946beea6 ubi-Linux-gnu-powerpc64.tar.gz
+v0.13.0 e8ef763d3553ce40d07fff7ccf1e6ba3f7bbd1e5cab8926cd8118f35c7567776 ubi-Linux-gnu-powerpc64le.tar.gz
+v0.13.0 df73196b5b02018cd6b6a83981c3e39484ede6a2a9d7ce29c7a9e025a3f1fd2b ubi-Linux-gnu-riscv64gc.tar.gz
+v0.13.0 05568d18d7bf1ab9c8ef392235e1a846aca99ae2687e4e6de314cea5467d56e5 ubi-Linux-gnu-s390x.tar.gz
+v0.13.0 1ecb7f6229d7b303b297c2fe43fb0c29413df7508278a7a27dc3a2a370de5bc8 ubi-Linux-musl-arm64.tar.gz
+v0.13.0 b46822f0615166db3e75827482b56c6bdefc4b70517bd1a4a2f82fe16f891e98 ubi-Linux-musl-i686.tar.gz
+v0.13.0 74aebaa56bf9a600c516e726aeb446c52c4c2c00059634232e768e70a8cb4ebe ubi-Linux-musl-x86_64.tar.gz
+v0.13.0 0e10f2bf1790e6b7f4a1c53022aa145b0f041c962040c4bd61832efc77e8d8aa ubi-Linux-musleabi-arm.tar.gz
+v0.13.0 62ea48691ef4688bb82b8c59a2088fbc83fedbf984bb528945c68f47a3a4bb6d ubi-macOS-arm64.tar.gz
+v0.13.0 639f978c582e977225749b85227b424126520174484616d1eeb871d45ff6b7d7 ubi-macOS-x86_64.tar.gz
+v0.13.0 4aabb6c314d0b85df168810a6cf852633d95a3ed1604101a1019190e369f852b ubi-NetBSD-x86_64.tar.gz

@@ -1,0 +1,27 @@
+#!/bin/sh
+# Print ubi-checksums.txt lines for a ubi release: the sha256 of the ubi binary
+# in each non-Windows asset, after checking the asset against its .sha256 file.
+# Usage: sh update-ubi-checksums.sh v0.13.0 >> ubi-checksums.txt
+set -euf
+
+version=$1
+base="https://github.com/houseabsolute/ubi/releases/download/$version"
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+gh api "repos/houseabsolute/ubi/releases/tags/$version" \
+  --jq '.assets[].name | select(endswith(".tar.gz"))' > "$work/assets"
+
+while read -r asset; do
+  curl --fail --silent --show-error --location --output "$work/$asset" "$base/$asset"
+  curl --fail --silent --show-error --location --output "$work/sum" "$base/$asset.sha256"
+  expected=$(cut -d' ' -f1 < "$work/sum")
+  actual=$(sha256sum "$work/$asset" | cut -d' ' -f1)
+  if [ "$expected" != "$actual" ]; then
+    echo "$asset does not match its .sha256 file" >&2
+    exit 1
+  fi
+  tar -xzf "$work/$asset" -C "$work" ubi
+  echo "$version $(sha256sum "$work/ubi" | cut -d' ' -f1) $asset"
+  rm -f "$work/ubi" "$work/$asset"
+done < "$work/assets"

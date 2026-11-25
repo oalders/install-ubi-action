@@ -123,7 +123,10 @@ jobs:
 `d9348539c2521f05225618139ea23fd3f54bce46` for reproducibility and security.
 The ubi release is pinned via `version`; the default is an immutable release.
 Empty values and values containing `/` are rejected. Releases not marked
-immutable can be re-pointed upstream, so prefer immutable ones.
+immutable can be re-pointed upstream, so prefer immutable ones. For releases
+listed in `ubi-checksums.txt`, the installed binary must match a listed
+SHA-256, or the action removes it and fails. Any other release installs with a
+warning that it was not verified.
 
 **Note:** each `projects` line is split on whitespace so it can carry ubi
 flags (e.g. `oalders/debounce -v`); glob characters are not expanded. Set
