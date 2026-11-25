@@ -62,7 +62,7 @@ runs:
 
         # ubi's default --in (./bin) is not on PATH, so default TARGET to ~/.local/bin.
         LOCAL_BIN=$HOME/.local/bin
-        test -d $LOCAL_BIN || mkdir -p $LOCAL_BIN
+        test -d "$LOCAL_BIN" || mkdir -p "$LOCAL_BIN"
         if [ "$INPUT_SUDO" != "true" ] && [ -z "${TARGET:-}" ]; then
           TARGET=$LOCAL_BIN
           echo "Setting TARGET to ${TARGET}"
@@ -90,7 +90,7 @@ runs:
         fi
         # Put TARGET first even if another ubi is on PATH, so later steps get this one.
         if [ -n "${TARGET:-}" ]; then
-          echo "$TARGET" >> $GITHUB_PATH
+          echo "$TARGET" >> "$GITHUB_PATH"
           PATH="$TARGET:$PATH"
         fi
 
@@ -105,8 +105,8 @@ runs:
             exit 1
           fi
           echo "✅ ubi ${UBI_VERSION} installed successfully at ${UBI_PATH}"
-          echo "version=${UBI_VERSION}" >> $GITHUB_OUTPUT
-          echo "path=${UBI_PATH}" >> $GITHUB_OUTPUT
+          echo "version=${UBI_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "path=${UBI_PATH}" >> "$GITHUB_OUTPUT"
         else
           echo "❌ Failed to install ubi"
           exit 1
