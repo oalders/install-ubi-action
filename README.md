@@ -58,7 +58,7 @@ jobs:
           is there ubi --verbose
           is there is --verbose
           is there debounce --verbose
-          is known summary var --md >> $GITHUB_STEP_SUMMARY
+          is known summary var --md >> "$GITHUB_STEP_SUMMARY"
 
   with_sudo:
     runs-on: ubuntu-latest
@@ -82,7 +82,7 @@ jobs:
           echo "ubi path: ${{ steps.ubi.outputs.path }}"
           is there ubi --verbose
           is there is --verbose
-          is known summary var --md >> $GITHUB_STEP_SUMMARY
+          is known summary var --md >> "$GITHUB_STEP_SUMMARY"
 
   with_sudo_target:
     runs-on: ubuntu-latest
@@ -107,7 +107,7 @@ jobs:
           echo "ubi path: ${{ steps.ubi.outputs.path }}"
           is there ubi --verbose
           is there is --verbose
-          is known summary var --md >> $GITHUB_STEP_SUMMARY
+          is known summary var --md >> "$GITHUB_STEP_SUMMARY"
 ```
 
 ## Inputs

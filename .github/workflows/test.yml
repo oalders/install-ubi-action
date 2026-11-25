@@ -54,7 +54,7 @@ jobs:
           [ "${{ steps.ubi.outputs.version }}" = "0.12.0" ]
           is there ubi --verbose
           is there is --verbose
-          is known summary var --md >> $GITHUB_STEP_SUMMARY
+          is known summary var --md >> "$GITHUB_STEP_SUMMARY"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sudo:
@@ -82,7 +82,7 @@ jobs:
           [ "${{ steps.ubi.outputs.version }}" = "0.13.0" ]
           is there ubi --verbose
           is there is --verbose
-          sudo is known summary var --md >> $GITHUB_STEP_SUMMARY
+          sudo is known summary var --md >> "$GITHUB_STEP_SUMMARY"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -217,6 +217,23 @@ jobs:
           done
         env:
           INPUT_PROJECTS: oalders/is
+          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_VERSION: v0.13.0
+  home_with_space:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Unquoted, the default TARGET under HOME is word-split and never created.
+      - name: Run the install script with a space in HOME
+        run: |
+          HOME="$RUNNER_TEMP/home dir" sh ./install-ubi.sh
+          grep -qxF "path=$RUNNER_TEMP/home dir/.local/bin/ubi" "$GITHUB_OUTPUT"
+          grep -qxF "$RUNNER_TEMP/home dir/.local/bin" "$GITHUB_PATH"
+        env:
+          INPUT_PROJECTS: ''
+          INPUT_SUDO: 'false'
           INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INPUT_VERSION: v0.13.0
   projects_glob:
