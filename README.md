@@ -97,7 +97,7 @@ jobs:
           TARGET: /usr/local/sbin
       - name: Use ubi to install other tools
         run: |
-          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --in /usr/sbin
+          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --in /usr/local/sbin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -130,7 +130,7 @@ runs:
               set -- --project $project
               has_in=
               for arg in "$@"; do
-                case $arg in --in|--in=*) has_in=1 ;; esac
+                case $arg in -i|--in|--in=*) has_in=1 ;; esac
               done
               [ -n "$has_in" ] || set -- "$@" --in "${TARGET:-/usr/local/bin}"
               if [ "$INPUT_SUDO" = "true" ]; then
