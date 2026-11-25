@@ -44,9 +44,10 @@ curl --fail --show-error --silent --location --output "$INSTALLER_FILE" "$INSTAL
 # TAR_OPTIONS would change what it fetches or extracts.
 set -- TAG="$INPUT_VERSION"
 [ -z "${TARGET:-}" ] || set -- "$@" TARGET="$TARGET"
+[ -z "${UBI_DEBUG_BOOTSTRAP:-}" ] || set -- "$@" UBI_DEBUG_BOOTSTRAP=1
 if [ "$INPUT_SUDO" = "true" ]; then
-  # Root gets a fixed PATH and none of the caller's proxy, CA or TMPDIR settings,
-  # as under sudo's env_reset before; on argv they would also land in sudo's log.
+  # Root gets a fixed PATH and none of the caller's proxy, CA or TMPDIR settings:
+  # on sudo's argv they would land in its log.
   sudo env -i PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     "$@" sh "$INSTALLER_FILE"
 else

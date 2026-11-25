@@ -150,7 +150,10 @@ jobs:
   stray_filename:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Either would break the bootstrap if it reached it.
+    strategy:
+      matrix:
+        sudo: [false, true]
+    # Either would break the bootstrap (GNU tar) if it reached it.
     env:
       FILENAME: not-a-real-asset.tar.gz
       TAR_OPTIONS: --to-stdout
@@ -165,6 +168,7 @@ jobs:
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          sudo: ${{ matrix.sudo }}
 
       - name: Verify installation
         run: |
