@@ -28,11 +28,12 @@ jobs:
       - name: Verify installations
         run: |
           test ! -e "$GITHUB_WORKSPACE/pwned"
-          [ "${{ steps.ubi.outputs.version }}" = "0.13.0" ]
+          [ "$VERSION" = "0.13.0" ]
           is there ubi --verbose
           is there is --verbose
           is there debounce --verbose
         env:
+          VERSION: ${{ steps.ubi.outputs.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   no_sudo:
     runs-on: ubuntu-latest
@@ -57,11 +58,12 @@ jobs:
 
       - name: Verify installations
         run: |
-          [ "${{ steps.ubi.outputs.version }}" = "0.12.0" ]
+          [ "$VERSION" = "0.12.0" ]
           is there ubi --verbose
           is there is --verbose
           is known summary var --md >> "$GITHUB_STEP_SUMMARY"
         env:
+          VERSION: ${{ steps.ubi.outputs.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   sudo:
     runs-on: ubuntu-latest
@@ -86,13 +88,15 @@ jobs:
 
       - name: Verify installations
         run: |
-          echo "ubi version: ${{ steps.ubi.outputs.version }}"
-          echo "ubi path: ${{ steps.ubi.outputs.path }}"
-          [ "${{ steps.ubi.outputs.version }}" = "0.13.0" ]
+          echo "ubi version: $VERSION"
+          echo "ubi path: $UBI_PATH"
+          [ "$VERSION" = "0.13.0" ]
           is there ubi --verbose
           is there is --verbose
           sudo is known summary var --md >> "$GITHUB_STEP_SUMMARY"
         env:
+          VERSION: ${{ steps.ubi.outputs.version }}
+          UBI_PATH: ${{ steps.ubi.outputs.path }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   sudo_with_target:
@@ -120,10 +124,13 @@ jobs:
 
       - name: Verify installations
         run: |
-          echo "ubi version: ${{ steps.ubi.outputs.version }}"
-          echo "ubi path: ${{ steps.ubi.outputs.path }}"
+          echo "ubi version: $VERSION"
+          echo "ubi path: $UBI_PATH"
           is there ubi --verbose
           is there is --verbose
+        env:
+          VERSION: ${{ steps.ubi.outputs.version }}
+          UBI_PATH: ${{ steps.ubi.outputs.path }}
   projects_injection:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -144,9 +151,11 @@ jobs:
       # ubi on PATH proves the run reached the projects loop.
       - name: Verify projects input was not executed
         run: |
-          [ "${{ steps.ubi.outcome }}" = failure ]
+          [ "$OUTCOME" = failure ]
           command -v ubi
           test ! -e "$GITHUB_WORKSPACE/pwned-projects"
+        env:
+          OUTCOME: ${{ steps.ubi.outcome }}
   stray_filename:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -172,7 +181,9 @@ jobs:
 
       - name: Verify installation
         run: |
-          [ "${{ steps.ubi.outputs.version }}" = "0.13.0" ]
+          [ "$VERSION" = "0.13.0" ]
+        env:
+          VERSION: ${{ steps.ubi.outputs.version }}
 
   shadowed_ubi:
     runs-on: ubuntu-latest
@@ -299,9 +310,11 @@ jobs:
       # ubi on PATH proves the run reached the projects loop.
       - name: Verify the project line was not glob-expanded
         run: |
-          [ "${{ steps.ubi.outcome }}" = failure ]
+          [ "$OUTCOME" = failure ]
           command -v ubi
           if command -v is; then exit 1; fi
+        env:
+          OUTCOME: ${{ steps.ubi.outcome }}
   invalid_version:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -330,13 +343,16 @@ jobs:
       # No ubi on PATH proves rejection happened before anything installed.
       - name: Verify invalid versions were rejected
         run: |
-          [ "${{ steps.empty.outcome }}" = failure ]
-          [ "${{ steps.slash.outcome }}" = failure ]
+          [ "$EMPTY" = failure ]
+          [ "$SLASH" = failure ]
           if command -v ubi; then exit 1; fi
+        env:
+          EMPTY: ${{ steps.empty.outcome }}
+          SLASH: ${{ steps.slash.outcome }}
   alpine:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    container: alpine:latest
+    container: alpine:3.24
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
