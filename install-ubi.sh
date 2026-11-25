@@ -75,21 +75,26 @@ fi
 UBI_PATH="${TARGET:-/usr/local/bin}/ubi"
 if [ -x "$UBI_PATH" ]; then
   # The bootstrap checks nothing it downloads, so check the binary before running it.
-  # No pipe, so a hashing failure stops the script under set -e.
+  # Hash with the privilege that installed it, and remove it on any failure, as TARGET may already be on PATH.
+  run() { if [ "$INPUT_SUDO" = "true" ]; then sudo "$@"; else "$@"; fi; }
+  reject() {
+    echo "❌ $1"
+    run rm -rf -- "$UBI_PATH"
+    exit 1
+  }
+  # No pipe, so a hashing failure is caught.
   if command -v sha256sum >/dev/null; then
-    UBI_SHA=$(sha256sum "$UBI_PATH")
+    UBI_SHA=$(run sha256sum "$UBI_PATH") || reject "could not hash $UBI_PATH"
   else
-    UBI_SHA=$(shasum -a 256 "$UBI_PATH")
+    UBI_SHA=$(run shasum -a 256 "$UBI_PATH") || reject "could not hash $UBI_PATH"
   fi
   UBI_SHA=${UBI_SHA%% *}
-  if ! V="$INPUT_VERSION" awk '$1 == ENVIRON["V"] { f = 1 } END { exit !f }' "$SUMS"; then
+  # Appending "" forces a string comparison: all-digit values would otherwise compare as numbers.
+  if ! V="$INPUT_VERSION" awk '$1 "" == ENVIRON["V"] "" { f = 1 } END { exit !f }' "$SUMS"; then
     echo "::warning::ubi $INPUT_VERSION is not in ubi-checksums.txt, so its checksum was not verified"
   elif ! V="$INPUT_VERSION" H="$UBI_SHA" \
-    awk '$1 == ENVIRON["V"] && $2 == ENVIRON["H"] { f = 1 } END { exit !f }' "$SUMS"; then
-    echo "❌ $UBI_PATH (sha256 $UBI_SHA) does not match any ubi $INPUT_VERSION checksum in ubi-checksums.txt"
-    # Remove it, as TARGET may already be on PATH.
-    if [ "$INPUT_SUDO" = "true" ]; then sudo rm -f "$UBI_PATH"; else rm -f "$UBI_PATH"; fi
-    exit 1
+    awk '$1 "" == ENVIRON["V"] "" && $2 "" == ENVIRON["H"] "" { f = 1 } END { exit !f }' "$SUMS"; then
+    reject "$UBI_PATH (sha256 $UBI_SHA) does not match any ubi $INPUT_VERSION checksum in ubi-checksums.txt"
   fi
   UBI_VERSION=$("$UBI_PATH" --version | head -n1 | awk '{print $2}')
   if [ -z "$UBI_VERSION" ]; then

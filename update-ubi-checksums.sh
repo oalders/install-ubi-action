@@ -2,6 +2,7 @@
 # Print ubi-checksums.txt lines for a ubi release: the sha256 of the ubi binary
 # in each non-Windows asset, after checking the asset against its .sha256 file.
 # Usage: sh update-ubi-checksums.sh v0.13.0 >> ubi-checksums.txt
+# Needs gh, curl and GNU sha256sum.
 set -euf
 
 version=$1
@@ -27,7 +28,12 @@ while read -r asset; do
     exit 1
   fi
   tar -xzf "$work/$asset" -C "$work" ubi
-  echo "$version $(sha256sum "$work/ubi" | cut -d' ' -f1) $asset" >> "$work/out"
+  if [ ! -f "$work/ubi" ] || [ -L "$work/ubi" ]; then
+    echo "$asset: ubi is not a regular file" >&2
+    exit 1
+  fi
+  sum=$(sha256sum "$work/ubi")
+  echo "$version ${sum%% *} $asset" >> "$work/out"
   rm -f "$work/ubi" "$work/$asset"
 done < "$work/assets"
 cat "$work/out"
