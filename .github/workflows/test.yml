@@ -204,10 +204,8 @@ jobs:
         run: |
           # An empty token would match every line below.
           [ -n "$INPUT_GITHUB_TOKEN" ]
-          yq -r '.runs.steps[] | select(.id == "install") | .run' action.yml > "$RUNNER_TEMP/install.sh"
-          [ -s "$RUNNER_TEMP/install.sh" ]
           for sudo in false true; do
-            if ! INPUT_SUDO=$sudo sh "$RUNNER_TEMP/install.sh" > "$RUNNER_TEMP/out.log" 2>&1; then
+            if ! INPUT_SUDO=$sudo sh ./install-ubi.sh > "$RUNNER_TEMP/out.log" 2>&1; then
               cat "$RUNNER_TEMP/out.log"
               exit 1
             fi
