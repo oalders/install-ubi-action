@@ -53,12 +53,15 @@ jobs:
 
       - name: Verify installations
         run: |
-          echo "ubi version: ${{ steps.ubi.outputs.version }}"
-          echo "ubi path: ${{ steps.ubi.outputs.path }}"
+          echo "ubi version: $VERSION"
+          echo "ubi path: $UBI_PATH"
           is there ubi --verbose
           is there is --verbose
           is there debounce --verbose
           is known summary var --md >> "$GITHUB_STEP_SUMMARY"
+        env:
+          VERSION: ${{ steps.ubi.outputs.version }}
+          UBI_PATH: ${{ steps.ubi.outputs.path }}
 
   with_sudo:
     runs-on: ubuntu-latest
@@ -78,11 +81,14 @@ jobs:
 
       - name: Verify installations
         run: |
-          echo "ubi version: ${{ steps.ubi.outputs.version }}"
-          echo "ubi path: ${{ steps.ubi.outputs.path }}"
+          echo "ubi version: $VERSION"
+          echo "ubi path: $UBI_PATH"
           is there ubi --verbose
           is there is --verbose
           is known summary var --md >> "$GITHUB_STEP_SUMMARY"
+        env:
+          VERSION: ${{ steps.ubi.outputs.version }}
+          UBI_PATH: ${{ steps.ubi.outputs.path }}
 
   with_sudo_target:
     runs-on: ubuntu-latest
@@ -103,11 +109,14 @@ jobs:
 
       - name: Verify installations
         run: |
-          echo "ubi version: ${{ steps.ubi.outputs.version }}"
-          echo "ubi path: ${{ steps.ubi.outputs.path }}"
+          echo "ubi version: $VERSION"
+          echo "ubi path: $UBI_PATH"
           is there ubi --verbose
           is there is --verbose
           is known summary var --md >> "$GITHUB_STEP_SUMMARY"
+        env:
+          VERSION: ${{ steps.ubi.outputs.version }}
+          UBI_PATH: ${{ steps.ubi.outputs.path }}
 ```
 
 ## Inputs
