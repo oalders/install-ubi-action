@@ -14,8 +14,8 @@ echo "Installing ubi universal binary installer..."
 
 # ubi's default --in (./bin) is not on PATH, so default TARGET to ~/.local/bin.
 LOCAL_BIN=$HOME/.local/bin
-test -d "$LOCAL_BIN" || mkdir -p "$LOCAL_BIN"
 if [ "$INPUT_SUDO" != "true" ] && [ -z "${TARGET:-}" ]; then
+  test -d "$LOCAL_BIN" || mkdir -p "$LOCAL_BIN"
   TARGET=$LOCAL_BIN
   echo "Setting TARGET to ${TARGET}"
   export TARGET
