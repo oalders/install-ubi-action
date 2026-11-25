@@ -40,16 +40,26 @@ INSTALLER=https://raw.githubusercontent.com/$URL_PATH
 INSTALLER_FILE=$(mktemp)
 trap 'rm -f "$INSTALLER_FILE"' EXIT
 curl --fail --show-error --silent --location --output "$INSTALLER_FILE" "$INSTALLER"
-# A caller's FILENAME would make the bootstrap fetch that asset instead of deriving one.
-unset FILENAME
+# Run the bootstrap with only what it and its tools need: a caller's FILENAME or
+# TAR_OPTIONS would change what it fetches or extracts.
+set -- TAG="$INPUT_VERSION"
+[ -z "${TARGET:-}" ] || set -- "$@" TARGET="$TARGET"
+[ -z "${UBI_DEBUG_BOOTSTRAP:-}" ] || set -- "$@" UBI_DEBUG_BOOTSTRAP=1
 if [ "$INPUT_SUDO" = "true" ]; then
-  if [ -z "${TARGET:-}" ]; then
-    sudo env TAG="$INPUT_VERSION" sh "$INSTALLER_FILE"
-  else
-    sudo env TAG="$INPUT_VERSION" TARGET="$TARGET" sh "$INSTALLER_FILE"
-  fi
+  # Root gets a fixed PATH and none of the caller's proxy, CA or TMPDIR settings:
+  # on sudo's argv they would land in its log.
+  sudo env -i PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    "$@" sh "$INSTALLER_FILE"
 else
-  env TAG="$INPUT_VERSION" TARGET="$TARGET" sh "$INSTALLER_FILE"
+  # xtrace off, so proxy credentials stay out of the log.
+  set +x
+  for var in TMPDIR http_proxy https_proxy HTTPS_PROXY all_proxy ALL_PROXY \
+    no_proxy NO_PROXY CURL_CA_BUNDLE SSL_CERT_FILE SSL_CERT_DIR; do
+    eval "val=\${$var:-}"
+    [ -z "$val" ] || set -- "$@" "$var=$val"
+  done
+  env -i PATH="$PATH" HOME="$HOME" "$@" sh "$INSTALLER_FILE"
+  set -x
 fi
 # Put TARGET first even if another ubi is on PATH, so later steps get this one.
 if [ -n "${TARGET:-}" ]; then
