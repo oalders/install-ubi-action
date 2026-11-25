@@ -150,8 +150,10 @@ jobs:
   stray_filename:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Either would break the bootstrap if it reached it.
     env:
       FILENAME: not-a-real-asset.tar.gz
+      TAR_OPTIONS: --to-stdout
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

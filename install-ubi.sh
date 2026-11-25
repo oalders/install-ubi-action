@@ -40,17 +40,25 @@ INSTALLER=https://raw.githubusercontent.com/$URL_PATH
 INSTALLER_FILE=$(mktemp)
 trap 'rm -f "$INSTALLER_FILE"' EXIT
 curl --fail --show-error --silent --location --output "$INSTALLER_FILE" "$INSTALLER"
-# A caller's FILENAME would make the bootstrap fetch that asset instead of deriving one.
-unset FILENAME
+# Run the bootstrap with only what it and its curl need: a caller's FILENAME or
+# TAR_OPTIONS would change what it fetches or extracts.
+# xtrace off, so proxy credentials stay out of the log.
+set +x
+set -- TAG="$INPUT_VERSION"
+[ -z "${TARGET:-}" ] || set -- "$@" TARGET="$TARGET"
+for var in TMPDIR http_proxy https_proxy HTTPS_PROXY all_proxy ALL_PROXY \
+  no_proxy NO_PROXY CURL_CA_BUNDLE SSL_CERT_FILE SSL_CERT_DIR; do
+  eval "val=\${$var:-}"
+  [ -z "$val" ] || set -- "$@" "$var=$val"
+done
 if [ "$INPUT_SUDO" = "true" ]; then
-  if [ -z "${TARGET:-}" ]; then
-    sudo env TAG="$INPUT_VERSION" sh "$INSTALLER_FILE"
-  else
-    sudo env TAG="$INPUT_VERSION" TARGET="$TARGET" sh "$INSTALLER_FILE"
-  fi
+  # A fixed PATH and no HOME, so root runs no binary or ~/.curlrc of the user's.
+  sudo env -i PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    "$@" sh "$INSTALLER_FILE"
 else
-  env TAG="$INPUT_VERSION" TARGET="$TARGET" sh "$INSTALLER_FILE"
+  env -i PATH="$PATH" HOME="$HOME" "$@" sh "$INSTALLER_FILE"
 fi
+set -x
 # Put TARGET first even if another ubi is on PATH, so later steps get this one.
 if [ -n "${TARGET:-}" ]; then
   echo "$TARGET" >> "$GITHUB_PATH"
