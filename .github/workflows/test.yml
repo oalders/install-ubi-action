@@ -364,6 +364,15 @@ jobs:
         with:
           persist-credentials: false
 
+      # The bootstrap rejects a missing TARGET, so without the guard these let it
+      # reach the GITHUB_PATH write the test is about.
+      - name: Create the TARGET directories
+        run: |
+          mkdir -p "$LF_TARGET" "$CR_TARGET"
+        env:
+          LF_TARGET: "/tmp/ubi-lf\n/tmp/injected-lf"
+          CR_TARGET: "/tmp/ubi-cr\r/tmp/injected-cr"
+
       - name: Install ubi with a newline in TARGET
         uses: ./
         id: lf
