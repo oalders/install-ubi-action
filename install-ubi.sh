@@ -21,6 +21,17 @@ if [ "$INPUT_SUDO" != "true" ] && [ -z "${TARGET:-}" ]; then
   export TARGET
 fi
 
+# GITHUB_PATH and GITHUB_OUTPUT are line-based, so a newline would add entries.
+nl='
+'
+cr=$(printf '\r')
+case "${TARGET:-}" in
+  *"$nl"*|*"$cr"*)
+    echo "Invalid TARGET: contains a newline or carriage return" >&2
+    exit 1
+    ;;
+esac
+
 COMMIT=d9348539c2521f05225618139ea23fd3f54bce46
 URL_PATH="houseabsolute/ubi/$COMMIT/bootstrap/bootstrap-ubi.sh"
 INSTALLER=https://raw.githubusercontent.com/$URL_PATH
