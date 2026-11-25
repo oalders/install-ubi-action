@@ -42,23 +42,24 @@ trap 'rm -f "$INSTALLER_FILE"' EXIT
 curl --fail --show-error --silent --location --output "$INSTALLER_FILE" "$INSTALLER"
 # Run the bootstrap with only what it and its curl need: a caller's FILENAME or
 # TAR_OPTIONS would change what it fetches or extracts.
-# xtrace off, so proxy credentials stay out of the log.
-set +x
 set -- TAG="$INPUT_VERSION"
 [ -z "${TARGET:-}" ] || set -- "$@" TARGET="$TARGET"
-for var in TMPDIR http_proxy https_proxy HTTPS_PROXY all_proxy ALL_PROXY \
-  no_proxy NO_PROXY CURL_CA_BUNDLE SSL_CERT_FILE SSL_CERT_DIR; do
-  eval "val=\${$var:-}"
-  [ -z "$val" ] || set -- "$@" "$var=$val"
-done
 if [ "$INPUT_SUDO" = "true" ]; then
-  # A fixed PATH and no HOME, so root runs no binary or ~/.curlrc of the user's.
+  # Root gets a fixed PATH and none of the caller's proxy, CA or TMPDIR settings,
+  # as under sudo's env_reset before; on argv they would also land in sudo's log.
   sudo env -i PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
     "$@" sh "$INSTALLER_FILE"
 else
+  # xtrace off, so proxy credentials stay out of the log.
+  set +x
+  for var in TMPDIR http_proxy https_proxy HTTPS_PROXY all_proxy ALL_PROXY \
+    no_proxy NO_PROXY CURL_CA_BUNDLE SSL_CERT_FILE SSL_CERT_DIR; do
+    eval "val=\${$var:-}"
+    [ -z "$val" ] || set -- "$@" "$var=$val"
+  done
   env -i PATH="$PATH" HOME="$HOME" "$@" sh "$INSTALLER_FILE"
+  set -x
 fi
-set -x
 # Put TARGET first even if another ubi is on PATH, so later steps get this one.
 if [ -n "${TARGET:-}" ]; then
   echo "$TARGET" >> "$GITHUB_PATH"
