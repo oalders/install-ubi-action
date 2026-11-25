@@ -102,7 +102,7 @@ jobs:
           TARGET: /usr/local/sbin
       - name: Use ubi to install other tools
         run: |
-          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --in /usr/sbin
+          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --in /usr/local/sbin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -173,6 +173,77 @@ jobs:
         run: |
           [ "$(command -v ubi)" = "$HOME/.local/bin/ubi" ]
           is there is --verbose
+  sudo_projects:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install ubi
+        uses: ./
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          sudo: true
+          projects: |
+            oalders/is
+            oalders/debounce -i /usr/local/sbin
+
+      - name: Verify installations
+        run: |
+          [ "$(command -v is)" = /usr/local/bin/is ]
+          [ "$(command -v debounce)" = /usr/local/sbin/debounce ]
+          is there ubi --verbose
+  token_not_logged:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The runner masks the token in its own log, so capture the raw output to check it.
+      - name: Run the install script with output captured
+        run: |
+          # An empty token would match every line below.
+          [ -n "$INPUT_GITHUB_TOKEN" ]
+          yq -r '.runs.steps[] | select(.id == "install") | .run' action.yml > "$RUNNER_TEMP/install.sh"
+          [ -s "$RUNNER_TEMP/install.sh" ]
+          for sudo in false true; do
+            if ! INPUT_SUDO=$sudo sh "$RUNNER_TEMP/install.sh" > "$RUNNER_TEMP/out.log" 2>&1; then
+              cat "$RUNNER_TEMP/out.log"
+              exit 1
+            fi
+            # Pattern on stdin keeps the token out of grep's argv.
+            if printf '%s\n' "$INPUT_GITHUB_TOKEN" | grep -qFf - "$RUNNER_TEMP/out.log"; then
+              echo "token leaked with sudo=$sudo"
+              exit 1
+            fi
+          done
+        env:
+          INPUT_PROJECTS: oalders/is
+          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_VERSION: v0.13.0
+  projects_glob:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # A glob would expand to this path and install oalders/is.
+      - run: mkdir -p oalders/is
+
+      - name: Install ubi
+        uses: ./
+        id: ubi
+        continue-on-error: true
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          projects: oalders/i[s]
+
+      # ubi on PATH proves the run reached the projects loop.
+      - name: Verify the project line was not glob-expanded
+        run: |
+          [ "${{ steps.ubi.outcome }}" = failure ]
+          command -v ubi
+          if command -v is; then exit 1; fi
   invalid_version:
     runs-on: ubuntu-latest
     steps:

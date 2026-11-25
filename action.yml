@@ -60,9 +60,7 @@ runs:
 
         echo "Installing ubi universal binary installer..."
 
-        # If run as non-root, ubi defaults to installing into ~/bin, which is
-        # not in the default PATH in GitHub CI. So, we'll default to
-        # ~/.local/bin
+        # ubi's default --in (./bin) is not on PATH, so default TARGET to ~/.local/bin.
         LOCAL_BIN=$HOME/.local/bin
         test -d $LOCAL_BIN || mkdir -p $LOCAL_BIN
         if [ "$INPUT_SUDO" != "true" ] && [ -z "${TARGET:-}" ]; then
@@ -128,15 +126,17 @@ runs:
             if [ -n "$project" ]; then
               echo "Installing $project..."
 
+              # ubi defaults --in to ./bin, so install beside ubi unless the line names a dir.
+              set -- --project $project
+              has_in=
+              for arg in "$@"; do
+                case $arg in -i|--in|--in=*) has_in=1 ;; esac
+              done
+              [ -n "$has_in" ] || set -- "$@" --in "${TARGET:-/usr/local/bin}"
               if [ "$INPUT_SUDO" = "true" ]; then
-                sudo --preserve-env=GITHUB_TOKEN "$UBI_PATH" --project $project
+                sudo --preserve-env=GITHUB_TOKEN "$UBI_PATH" "$@"
               else
-                project_has_in=$(echo "$project" | grep -- "--in" || true)
-                if [ -z "$project_has_in" ] && [ -n "$TARGET" ]; then
-                  "$UBI_PATH" --project $project --in "$TARGET"
-                else
-                  "$UBI_PATH" --project $project
-                fi
+                "$UBI_PATH" "$@"
               fi
 
               echo "✅ Installed $project"

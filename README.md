@@ -46,8 +46,8 @@ jobs:
 
       - name: Use ubi to install "is" and "debounce"
         run: |
-          ubi --project oalders/is
-          ubi --project oalders/debounce
+          ubi --project oalders/is --in "$HOME/.local/bin"
+          ubi --project oalders/debounce --in "$HOME/.local/bin"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -72,7 +72,7 @@ jobs:
 
       - name: Use ubi to install other tools
         run: |
-          sudo ubi --project oalders/is
+          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --in /usr/local/bin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -97,7 +97,7 @@ jobs:
           TARGET: /usr/local/sbin
       - name: Use ubi to install other tools
         run: |
-          sudo ubi --project oalders/is --in /usr/sbin
+          sudo --preserve-env=GITHUB_TOKEN ubi --project oalders/is --in /usr/local/sbin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
