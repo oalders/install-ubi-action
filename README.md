@@ -10,7 +10,7 @@ and installing pre-built binaries from GitHub releases.
 
 ```yaml
 - name: Install ubi, is and debounce
-  uses: oalders/install-ubi-action@v0.0.6
+  uses: oalders/install-ubi-action@v0.0.7
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     projects: |
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi, is and debounce
-        uses: oalders/install-ubi-action@v0.0.6
+        uses: oalders/install-ubi-action@v0.0.7
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           projects: |
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.6
+        uses: oalders/install-ubi-action@v0.0.7
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.6
+        uses: oalders/install-ubi-action@v0.0.7
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -88,7 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install ubi
-        uses: oalders/install-ubi-action@v0.0.6
+        uses: oalders/install-ubi-action@v0.0.7
         id: ubi
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
