@@ -75,18 +75,20 @@ fi
 UBI_PATH="${TARGET:-/usr/local/bin}/ubi"
 if [ -x "$UBI_PATH" ]; then
   # The bootstrap checks nothing it downloads, so check the binary before running it.
-  # Hash with the privilege that installed it, and remove it on any failure, as TARGET may already be on PATH.
+  # Hash with the privilege that installed it.
+  # Remove it on any failure, as TARGET may already be on PATH.
   run() { if [ "$INPUT_SUDO" = "true" ]; then sudo "$@"; else "$@"; fi; }
   reject() {
     echo "❌ $1"
-    run rm -rf -- "$UBI_PATH"
+    # set -e is off here when called after ||, so report a failed removal.
+    run rm -f -- "$UBI_PATH" || echo "❌ could not remove $UBI_PATH; do not use it"
     exit 1
   }
   # No pipe, so a hashing failure is caught.
   if command -v sha256sum >/dev/null; then
-    UBI_SHA=$(run sha256sum "$UBI_PATH") || reject "could not hash $UBI_PATH"
+    UBI_SHA=$(run sha256sum -- "$UBI_PATH") || reject "could not hash $UBI_PATH"
   else
-    UBI_SHA=$(run shasum -a 256 "$UBI_PATH") || reject "could not hash $UBI_PATH"
+    UBI_SHA=$(run shasum -a 256 -- "$UBI_PATH") || reject "could not hash $UBI_PATH"
   fi
   # sha256sum prefixes the line with a backslash when the path contains one.
   UBI_SHA=${UBI_SHA#\\}
